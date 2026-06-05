@@ -120,6 +120,12 @@ export default function App() {
   return (
     <div className="app">
       <style>{styles}</style>
+      <section className="premium-banner">
+  <img
+    src="/banner-donatello-premium.png"
+    alt="Ventas Donatello Premium"
+  />
+</section>
 
       <header className="hero">
         <div className="hero-overlay" />
