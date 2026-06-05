@@ -1,0 +1,12 @@
+.premium-banner {
+  width: 100%;
+  background: #06251a;
+  overflow: hidden;
+  border-bottom: 3px solid #c9952f;
+}
+
+.premium-banner img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
