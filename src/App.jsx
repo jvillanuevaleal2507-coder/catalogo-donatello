@@ -384,7 +384,7 @@ const styles = `
 
   .premium-banner img {
   width: 100%;
-  height: 350px;
+  height: 250px;
   object-fit: cover;
   object-position: center top;
 }
