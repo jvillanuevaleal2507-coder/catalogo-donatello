@@ -374,18 +374,16 @@ const styles = `
     box-shadow: 0 13px 28px rgba(0,0,0,.20);
   }
 
-  .premium-banner {
-    width: 100%;
-    background: #07140f;
-    overflow: hidden;
-    border-bottom: 3px solid var(--gold);
-    box-shadow: 0 18px 48px rgba(7,20,15,.28);
-  }
-
-  .premium-banner img {
+   .premium-banner {
   width: 100%;
-  height: 250px;
-  object-fit: contain;
+  background: #06251a;
+  overflow: hidden;
+}
+
+.premium-banner img {
+  width: 100%;
+  height: auto;
+  display: block;
 }
 
   .hero {
