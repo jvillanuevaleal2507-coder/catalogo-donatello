@@ -374,10 +374,11 @@ const styles = `
     box-shadow: 0 13px 28px rgba(0,0,0,.20);
   }
 
-   .premium-banner {
+.premium-banner {
   width: 100%;
-  background: #06251a;
+  max-height: 320px;
   overflow: hidden;
+  border-bottom: 2px solid #c89b3c;
 }
 
 .premium-banner img {
@@ -385,7 +386,7 @@ const styles = `
   height: auto;
   display: block;
 }
-
+  
   .hero {
     position: relative;
     min-height: 390px;
