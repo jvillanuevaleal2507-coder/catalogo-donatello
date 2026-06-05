@@ -120,30 +120,33 @@ export default function App() {
   return (
     <div className="app">
       <style>{styles}</style>
-      <section className="premium-banner">
-  <img
-    src="/banner-donatello-premium.png"
-    alt="Ventas Donatello Premium"
-  />
-</section>
-
-      <header className="hero">
-        <div className="hero-overlay" />
-
-        <div className="hero-content">
-          <div className="brand-mark">
+      <header className="topbar">
+        <div className="topbar-inner">
+          <div className="topbar-brand">
             <img src="/logo-donatello.png" alt="Ventas Donatello" />
+            <div>
+              <strong>Ventas Donatello</strong>
+              <span>Hogar • Muebles • Iluminación • Decoración</span>
+            </div>
           </div>
 
-          <div>
-            <p className="eyebrow">Showroom digital</p>
-            <h1>Ventas Donatello</h1>
-            <p className="tagline">
-              Hogar • Muebles • Iluminación • Decoración
-            </p>
-          </div>
+          <a
+            className="topbar-whatsapp"
+            href={`https://wa.me/${WHATSAPP_NUMBER}`}
+            target="_blank"
+            rel="noreferrer"
+          >
+            WhatsApp
+          </a>
         </div>
       </header>
+
+      <section className="premium-banner">
+        <img
+          src="/banner-donatello-premium.png"
+          alt="Ventas Donatello Premium - catálogo de muebles, decoración, iluminación, bazar y juguetes"
+        />
+      </section>
 
       <main className="shell">
         <section className="intro-card">
@@ -310,6 +313,81 @@ const styles = `
     min-height: 100vh;
   }
 
+  .topbar {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    background: linear-gradient(135deg, #07140f 0%, #0f2c21 62%, #07140f 100%);
+    border-bottom: 1px solid rgba(230,195,122,.45);
+    box-shadow: 0 14px 35px rgba(7,20,15,.24);
+  }
+
+  .topbar-inner {
+    width: min(1380px, calc(100% - 28px));
+    min-height: 82px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 18px;
+  }
+
+  .topbar-brand {
+    display: flex;
+    align-items: center;
+    gap: 13px;
+    color: var(--cream);
+  }
+
+  .topbar-brand img {
+    width: 62px;
+    height: 62px;
+    object-fit: contain;
+    border-radius: 18px;
+    background: rgba(255,250,240,.08);
+    border: 1px solid rgba(230,195,122,.45);
+  }
+
+  .topbar-brand strong {
+    display: block;
+    font-size: clamp(1.25rem, 2.2vw, 2rem);
+    line-height: 1;
+    letter-spacing: -.035em;
+  }
+
+  .topbar-brand span {
+    display: block;
+    margin-top: 5px;
+    color: var(--gold-soft);
+    font-weight: 850;
+    font-size: .88rem;
+  }
+
+  .topbar-whatsapp {
+    color: var(--cream);
+    background: linear-gradient(135deg, #1f8a56, #0f5132);
+    border: 1px solid rgba(230,195,122,.38);
+    border-radius: 999px;
+    text-decoration: none;
+    font-weight: 950;
+    padding: 13px 20px;
+    box-shadow: 0 13px 28px rgba(0,0,0,.20);
+  }
+
+  .premium-banner {
+    width: 100%;
+    background: #07140f;
+    overflow: hidden;
+    border-bottom: 3px solid var(--gold);
+    box-shadow: 0 18px 48px rgba(7,20,15,.28);
+  }
+
+  .premium-banner img {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+
   .hero {
     position: relative;
     min-height: 390px;
@@ -429,7 +507,7 @@ const styles = `
 
   .shell {
     width: min(1180px, calc(100% - 32px));
-    margin: -72px auto 0;
+    margin: 26px auto 0;
     position: relative;
     z-index: 3;
     display: grid;
@@ -794,6 +872,25 @@ const styles = `
   }
 
   @media (max-width: 680px) {
+    .topbar-inner {
+      min-height: 72px;
+    }
+
+    .topbar-brand img {
+      width: 50px;
+      height: 50px;
+      border-radius: 15px;
+    }
+
+    .topbar-brand span {
+      font-size: .72rem;
+    }
+
+    .topbar-whatsapp {
+      padding: 11px 14px;
+      font-size: .86rem;
+    }
+
     .hero {
       min-height: 390px;
     }
