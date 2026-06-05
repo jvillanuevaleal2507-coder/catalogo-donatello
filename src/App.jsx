@@ -4,9 +4,12 @@ import { createClient } from "@supabase/supabase-js";
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
+console.log("SUPABASE URL:", supabaseUrl);
+console.log("SUPABASE KEY:", supabaseAnonKey ? "SI HAY KEY" : "NO HAY KEY");
+
 // Cambia este número por el WhatsApp oficial de Ventas Donatello.
 // Formato recomendado: país + lada + número, sin espacios. Ejemplo México: 528991234567
-const WHATSAPP_NUMBER = "528999999999";
+const WHATSAPP_NUMBER = "528999122313";
 
 const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
