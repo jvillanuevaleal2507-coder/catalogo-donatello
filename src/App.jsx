@@ -243,14 +243,23 @@ export default function App() {
                       <strong>{money(product.price)}</strong>
                     </div>
 
+
                     <a
-                      className="whatsapp-btn"
-                      href={buildWhatsAppLink(product)}
-                      target="_blank"
-                      rel="noreferrer"
-                    >
-                      💬 Cotizar por WhatsApp
-                    </a>
+  className="whatsapp-btn"
+  href={buildWhatsAppLink(product)}
+  target="_blank"
+  rel="noreferrer"
+  onClick={() => {
+    track("whatsapp_click", {
+      location: "product",
+      product_name: product.name,
+      product_code: product.code,
+      category: product.category,
+    });
+  }}
+>
+  💬 Cotizar por WhatsApp
+</a>
                   </div>
                 </article>
               ))}
