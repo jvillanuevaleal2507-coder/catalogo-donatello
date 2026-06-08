@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { createClient } from "@supabase/supabase-js";
+import { track } from "@vercel/analytics";
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
@@ -130,14 +131,20 @@ export default function App() {
             </div>
           </div>
 
+
           <a
-            className="topbar-whatsapp"
-            href={`https://wa.me/${WHATSAPP_NUMBER}`}
-            target="_blank"
-            rel="noreferrer"
-          >
-            WhatsApp
-          </a>
+  className="topbar-whatsapp"
+  href={`https://wa.me/${WHATSAPP_NUMBER}`}
+  target="_blank"
+  rel="noreferrer"
+  onClick={() => {
+    track("whatsapp_click", {
+      location: "header",
+    });
+  }}
+>
+  WhatsApp
+</a>
         </div>
       </header>
 
