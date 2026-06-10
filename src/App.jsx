@@ -413,12 +413,15 @@ const styles = `
   }
 
   .premium-banner img {
+    width: 100%;
+    height: 170px;
     max-height: 170px;
     object-fit: cover;
     object-position: center;
   }
 }
-  
+
+
   .hero {
     position: relative;
     min-height: 390px;
