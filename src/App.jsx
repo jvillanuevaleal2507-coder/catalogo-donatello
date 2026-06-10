@@ -392,7 +392,6 @@ const styles = `
 
 .premium-banner {
   width: 100%;
-  max-height: 320px;
   overflow: hidden;
   border-bottom: 2px solid #c89b3c;
   background: #07140f;
@@ -400,23 +399,23 @@ const styles = `
 
 .premium-banner img {
   width: 100%;
-  height: 100%;
-  max-height: 320px;
-  object-fit: cover;
+  height: auto;
+  max-height: none;
+  object-fit: contain;
   object-position: center;
   display: block;
 }
 
 @media (max-width: 768px) {
   .premium-banner {
-    max-height: 170px;
+    max-height: none;
   }
 
   .premium-banner img {
     width: 100%;
-    height: 170px;
-    max-height: 170px;
-    object-fit: cover;
+    height: auto;
+    max-height: none;
+    object-fit: contain;
     object-position: center;
   }
 }
