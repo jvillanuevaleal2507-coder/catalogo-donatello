@@ -405,7 +405,9 @@ const styles = `
   object-fit: cover;
   object-position: center;
   display: block;
-  @media (max-width: 768px) {
+}
+
+@media (max-width: 768px) {
   .premium-banner {
     max-height: 170px;
   }
