@@ -395,11 +395,15 @@ const styles = `
   max-height: 320px;
   overflow: hidden;
   border-bottom: 2px solid #c89b3c;
+  background: #07140f;
 }
 
 .premium-banner img {
   width: 100%;
-  height: auto;
+  height: 100%;
+  max-height: 320px;
+  object-fit: cover;
+  object-position: center;
   display: block;
 }
   
@@ -873,6 +877,18 @@ const styles = `
       grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 
+    .topbar-inner {
+      width: min(100% - 24px, 1180px);
+    }
+
+    .premium-banner {
+      max-height: 250px;
+    }
+
+    .premium-banner img {
+      max-height: 250px;
+    }
+
     .hero-content {
       min-height: 340px;
       grid-template-columns: 125px 1fr;
@@ -887,23 +903,57 @@ const styles = `
   }
 
   @media (max-width: 680px) {
+    .topbar {
+      position: sticky;
+    }
+
     .topbar-inner {
-      min-height: 72px;
+      width: min(100% - 20px, 1180px);
+      min-height: auto;
+      padding: 10px 0;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .topbar-brand {
+      gap: 9px;
+      min-width: 0;
+      flex: 1;
     }
 
     .topbar-brand img {
-      width: 50px;
-      height: 50px;
-      border-radius: 15px;
+      width: 44px;
+      height: 44px;
+      border-radius: 13px;
+      flex: 0 0 auto;
+    }
+
+    .topbar-brand strong {
+      font-size: clamp(1.05rem, 5.4vw, 1.42rem);
+      letter-spacing: -0.04em;
+      white-space: nowrap;
     }
 
     .topbar-brand span {
-      font-size: .72rem;
+      font-size: .66rem;
+      line-height: 1.15;
+      max-width: 190px;
     }
 
     .topbar-whatsapp {
-      padding: 11px 14px;
-      font-size: .86rem;
+      padding: 10px 12px;
+      font-size: .78rem;
+      white-space: nowrap;
+      box-shadow: 0 8px 18px rgba(0,0,0,.18);
+    }
+
+    .premium-banner {
+      max-height: 185px;
+    }
+
+    .premium-banner img {
+      max-height: 185px;
+      object-position: center;
     }
 
     .hero {
@@ -921,10 +971,16 @@ const styles = `
     }
 
     .brand-mark {
-      width: 100px;
-      height: 100px;
-      min-width: 100px;
-      border-radius: 25px;
+      width: 90px;
+      height: 90px;
+      min-width: 90px;
+      border-radius: 23px;
+    }
+
+    .brand-mark img {
+      width: 106%;
+      height: 106%;
+      transform: none;
     }
 
     h1 {
@@ -941,28 +997,64 @@ const styles = `
 
     .shell {
       width: min(100% - 22px, 1180px);
-      margin-top: -58px;
+      margin-top: 18px;
     }
 
     .intro-card {
       grid-template-columns: 1fr;
-      padding: 18px;
-      border-radius: 28px;
+      padding: 17px;
+      border-radius: 24px;
+      gap: 14px;
+    }
+
+    .intro-card h2 {
+      font-size: clamp(1.35rem, 8vw, 2rem);
+      line-height: 1.02;
+    }
+
+    .intro-card p {
+      font-size: .92rem;
+      line-height: 1.35;
     }
 
     .intro-card::after {
       width: 100%;
-      border-radius: 20px;
-      line-height: 1.4;
+      border-radius: 18px;
+      line-height: 1.35;
+      padding: 10px 12px;
+      font-size: .86rem;
     }
 
     .refresh-btn {
       width: 100%;
+      min-height: 46px;
     }
 
     .filters-card {
-      border-radius: 28px;
-      padding: 16px;
+      border-radius: 24px;
+      padding: 14px;
+      gap: 12px;
+    }
+
+    .search-box {
+      min-height: 48px;
+      border-radius: 16px;
+    }
+
+    .search-box input {
+      font-size: .95rem;
+    }
+
+    .category-scroll {
+      gap: 8px;
+      padding-bottom: 2px;
+    }
+
+    .category-pill {
+      min-height: 38px;
+      padding: 0 13px;
+      font-size: .76rem;
+      white-space: nowrap;
     }
 
     .product-grid {
@@ -1031,6 +1123,70 @@ const styles = `
       width: min(100% - 22px, 1180px);
       flex-direction: column;
       text-align: center;
+    }
+  }
+
+  @media (max-width: 420px) {
+    .topbar-inner {
+      width: min(100% - 16px, 1180px);
+      gap: 8px;
+    }
+
+    .topbar-brand img {
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+    }
+
+    .topbar-brand strong {
+      font-size: 1.05rem;
+    }
+
+    .topbar-brand span {
+      display: none;
+    }
+
+    .topbar-whatsapp {
+      padding: 9px 10px;
+      font-size: .74rem;
+    }
+
+    .premium-banner {
+      max-height: 155px;
+    }
+
+    .premium-banner img {
+      max-height: 155px;
+    }
+
+    .shell {
+      width: min(100% - 18px, 1180px);
+      margin-top: 14px;
+    }
+
+    .intro-card,
+    .filters-card {
+      border-radius: 22px;
+    }
+
+    .product-grid {
+      gap: 10px;
+    }
+
+    .product-body {
+      padding: 10px;
+    }
+
+    .product-card h3 {
+      font-size: .88rem;
+    }
+
+    .price-row strong {
+      font-size: .98rem;
+    }
+
+    .whatsapp-btn {
+      font-size: .72rem;
     }
   }
 `;
