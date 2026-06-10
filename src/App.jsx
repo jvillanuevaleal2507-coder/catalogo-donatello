@@ -150,8 +150,14 @@ export default function App() {
 
       <section className="premium-banner">
         <img
+          className="desktop-banner"
           src="/banner-donatello-premium.png"
-          alt="Ventas Donatello Premium - catálogo de muebles, decoración, iluminación, bazar y juguetes"
+          alt="Ventas Donatello Premium"
+        />
+        <img
+          className="mobile-banner"
+          src="/banner-mobile.png"
+          alt="Ventas Donatello Premium móvil"
         />
       </section>
 
@@ -392,6 +398,7 @@ const styles = `
 
 .premium-banner {
   width: 100%;
+  max-height: 320px;
   overflow: hidden;
   border-bottom: 2px solid #c89b3c;
   background: #07140f;
@@ -399,28 +406,13 @@ const styles = `
 
 .premium-banner img {
   width: 100%;
-  height: auto;
-  max-height: none;
-  object-fit: contain;
+  height: 100%;
+  max-height: 320px;
+  object-fit: cover;
   object-position: center;
   display: block;
 }
-
-@media (max-width: 768px) {
-  .premium-banner {
-    max-height: none;
-  }
-
-  .premium-banner img {
-    width: 100%;
-    height: auto;
-    max-height: none;
-    object-fit: contain;
-    object-position: center;
-  }
-}
-
-
+  
   .hero {
     position: relative;
     min-height: 390px;
