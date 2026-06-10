@@ -402,9 +402,19 @@ const styles = `
   width: 100%;
   height: 100%;
   max-height: 320px;
-  object-fit: contain;
+  object-fit: cover;
   object-position: center;
   display: block;
+  @media (max-width: 768px) {
+  .premium-banner {
+    max-height: 170px;
+  }
+
+  .premium-banner img {
+    max-height: 170px;
+    object-fit: cover;
+    object-position: center;
+  }
 }
   
   .hero {
