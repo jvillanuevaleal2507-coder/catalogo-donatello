@@ -966,12 +966,65 @@ const styles = `
     }
 
     .product-grid {
-      grid-template-columns: 1fr;
-      gap: 18px;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
     }
 
     .product-card {
-      border-radius: 30px;
+      border-radius: 22px;
+    }
+
+    .image-wrap {
+      aspect-ratio: 1 / 1;
+    }
+
+    .product-body {
+      padding: 12px;
+      gap: 6px;
+    }
+
+    .product-card h3 {
+      font-size: 0.95rem;
+      line-height: 1.15;
+      letter-spacing: -0.02em;
+    }
+
+    .product-category {
+      font-size: 0.60rem;
+      letter-spacing: 0.12em;
+    }
+
+    .code {
+      display: none;
+    }
+
+    .price-row {
+      padding: 8px 10px;
+      border-radius: 14px;
+      gap: 6px;
+    }
+
+    .price-row span {
+      font-size: 0.70rem;
+    }
+
+    .price-row strong {
+      font-size: 1.05rem;
+    }
+
+    .whatsapp-btn {
+      min-height: 40px;
+      font-size: 0.78rem;
+      padding: 0 8px;
+      text-align: center;
+      line-height: 1.1;
+    }
+
+    .stock-pill {
+      top: 8px;
+      left: 8px;
+      padding: 5px 8px;
+      font-size: 0.62rem;
     }
 
     .footer {
