@@ -402,7 +402,7 @@ const styles = `
   width: 100%;
   height: 100%;
   max-height: 320px;
-  object-fit: cover;
+  object-fit: contain;
   object-position: center;
   display: block;
 }
