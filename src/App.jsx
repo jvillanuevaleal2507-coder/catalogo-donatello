@@ -68,6 +68,7 @@ export default function App() {
   const [loadError, setLoadError] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("Todas");
+  const [selectedProduct, setSelectedProduct] = useState(null);
 
   useEffect(() => {
     loadProducts();
@@ -230,22 +231,29 @@ export default function App() {
             <section className="product-grid">
               {filteredProducts.map((product) => (
                 <article className="product-card" key={product.id}>
-                  <div className="image-wrap">
+                  <button
+                    className="image-wrap image-action"
+                    type="button"
+                    onClick={() => setSelectedProduct(product)}
+                    aria-label={`Ver detalle de ${product.name}`}
+                  >
                     <ProductImage src={product.image_url} alt={product.name} />
                     <span className="stock-pill">Disponible</span>
-                  </div>
+                    <span className="view-pill">Ver detalle</span>
+                  </button>
 
                   <div className="product-body">
-                    <span className="product-category">
-                      {normalizeCategory(product.category)}
-                    </span>
+                    <div className="card-meta">
+                      <span className="product-category">
+                        {normalizeCategory(product.category)}
+                      </span>
+                      <span className="premium-badge">Selección Donatello</span>
+                    </div>
 
                     <h3>{product.name}</h3>
 
-                    <p className="code">{product.code}</p>
-
                     <div className="price-row">
-                      <span>Precio</span>
+                      <span>Precio final</span>
                       <strong>{money(product.price)}</strong>
                     </div>
 
@@ -273,6 +281,65 @@ export default function App() {
           </>
         )}
       </main>
+
+      {selectedProduct && (
+        <div
+          className="product-modal-backdrop"
+          role="dialog"
+          aria-modal="true"
+          aria-label={`Detalle de ${selectedProduct.name}`}
+          onClick={() => setSelectedProduct(null)}
+        >
+          <div className="product-modal" onClick={(event) => event.stopPropagation()}>
+            <button
+              className="modal-close"
+              type="button"
+              onClick={() => setSelectedProduct(null)}
+              aria-label="Cerrar detalle"
+            >
+              ×
+            </button>
+
+            <div className="modal-image-wrap">
+              <ProductImage src={selectedProduct.image_url} alt={selectedProduct.name} />
+            </div>
+
+            <div className="modal-info">
+              <span className="modal-category">
+                {normalizeCategory(selectedProduct.category)}
+              </span>
+              <h2>{selectedProduct.name}</h2>
+              <p className="modal-ref">Referencia: {selectedProduct.code}</p>
+
+              <div className="modal-price">
+                <span>Precio final</span>
+                <strong>{money(selectedProduct.price)}</strong>
+              </div>
+
+              <a
+                className="modal-whatsapp"
+                href={buildWhatsAppLink(selectedProduct)}
+                target="_blank"
+                rel="noreferrer"
+                onClick={() => {
+                  track("whatsapp_click", {
+                    location: "product_modal",
+                    product_name: selectedProduct.name,
+                    product_code: selectedProduct.code,
+                    category: selectedProduct.category,
+                  });
+                }}
+              >
+                💬 Cotizar este producto
+              </a>
+
+              <p className="modal-note">
+                Catálogo sujeto a disponibilidad. Te atendemos por WhatsApp para confirmar detalles.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
 
       <footer className="footer">
         <strong>Ventas Donatello</strong>
@@ -767,8 +834,24 @@ const styles = `
     position: relative;
     background:
       linear-gradient(135deg, rgba(16,41,31,.08), rgba(185,135,49,.13));
-    aspect-ratio: 1 / .78;
+    aspect-ratio: 1 / .95;
     overflow: hidden;
+  }
+
+  .image-action {
+    width: 100%;
+    display: block;
+    border: 0;
+    padding: 0;
+    cursor: pointer;
+    text-align: left;
+  }
+
+  .image-action:focus-visible,
+  .modal-close:focus-visible,
+  .modal-whatsapp:focus-visible {
+    outline: 4px solid rgba(230,195,122,.55);
+    outline-offset: 3px;
   }
 
   .product-image {
@@ -811,6 +894,27 @@ const styles = `
     box-shadow: 0 10px 22px rgba(0,0,0,.22);
   }
 
+  .view-pill {
+    position: absolute;
+    right: 13px;
+    bottom: 13px;
+    padding: 8px 12px;
+    border-radius: 999px;
+    background: rgba(255,244,220,.92);
+    color: var(--green-black);
+    font-size: .72rem;
+    font-weight: 950;
+    opacity: 0;
+    transform: translateY(6px);
+    transition: opacity .2s ease, transform .2s ease;
+    box-shadow: 0 10px 22px rgba(0,0,0,.15);
+  }
+
+  .product-card:hover .view-pill {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
   .product-body {
     position: relative;
     z-index: 1;
@@ -821,12 +925,30 @@ const styles = `
     flex: 1;
   }
 
+  .card-meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+  }
+
   .product-category {
     color: var(--gold);
     text-transform: uppercase;
     letter-spacing: .16em;
     font-weight: 950;
     font-size: .72rem;
+  }
+
+  .premium-badge {
+    color: var(--green);
+    background: rgba(15,44,33,.08);
+    border: 1px solid rgba(15,44,33,.12);
+    border-radius: 999px;
+    padding: 5px 8px;
+    font-size: .68rem;
+    font-weight: 950;
+    white-space: nowrap;
   }
 
   .product-card h3 {
@@ -883,6 +1005,136 @@ const styles = `
 
   .whatsapp-btn:hover {
     box-shadow: 0 18px 36px rgba(31,122,75,.34);
+  }
+
+  .product-modal-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 60;
+    background: rgba(5, 23, 17, .78);
+    backdrop-filter: blur(8px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 22px;
+  }
+
+  .product-modal {
+    width: min(980px, 100%);
+    max-height: min(88vh, 980px);
+    overflow: auto;
+    background:
+      linear-gradient(180deg, rgba(255,250,240,.99), rgba(255,244,220,.96));
+    border: 1px solid rgba(185,135,49,.58);
+    border-radius: 34px;
+    box-shadow: 0 35px 110px rgba(0,0,0,.45);
+    display: grid;
+    grid-template-columns: 1.05fr .95fr;
+    position: relative;
+  }
+
+  .modal-close {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    z-index: 2;
+    width: 44px;
+    height: 44px;
+    border: 0;
+    border-radius: 999px;
+    background: rgba(7,20,15,.92);
+    color: var(--cream);
+    font-size: 1.8rem;
+    line-height: 1;
+    cursor: pointer;
+    box-shadow: 0 12px 28px rgba(0,0,0,.22);
+  }
+
+  .modal-image-wrap {
+    min-height: 520px;
+    background:
+      radial-gradient(circle at center, rgba(230,195,122,.18), transparent 58%),
+      rgba(15,44,33,.08);
+    overflow: hidden;
+    border-radius: 34px 0 0 34px;
+  }
+
+  .modal-image-wrap .product-image {
+    width: 100%;
+    height: 100%;
+    min-height: 520px;
+    object-fit: cover;
+  }
+
+  .modal-info {
+    padding: 42px 34px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .modal-category {
+    width: fit-content;
+    color: var(--gold);
+    text-transform: uppercase;
+    letter-spacing: .16em;
+    font-weight: 950;
+    font-size: .78rem;
+  }
+
+  .modal-info h2 {
+    margin: 0;
+    color: var(--green-black);
+    font-size: clamp(1.65rem, 4vw, 2.5rem);
+    line-height: 1.04;
+    letter-spacing: -.04em;
+  }
+
+  .modal-ref {
+    margin: 0;
+    color: var(--muted);
+    font-weight: 800;
+  }
+
+  .modal-price {
+    display: grid;
+    gap: 5px;
+    margin: 8px 0;
+    padding: 17px 18px;
+    border-radius: 24px;
+    background: rgba(255,255,255,.72);
+    border: 1px solid rgba(185,135,49,.30);
+  }
+
+  .modal-price span {
+    color: var(--muted);
+    font-weight: 900;
+  }
+
+  .modal-price strong {
+    color: var(--brown);
+    font-size: 2.4rem;
+    line-height: 1;
+  }
+
+  .modal-whatsapp {
+    min-height: 58px;
+    border-radius: 999px;
+    background: linear-gradient(135deg, #1f8a56, #0f5132);
+    color: white;
+    text-decoration: none;
+    font-weight: 950;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 16px 34px rgba(31,122,75,.28);
+  }
+
+  .modal-note {
+    margin: 0;
+    color: var(--muted);
+    line-height: 1.45;
+    font-weight: 700;
   }
 
   .footer {
@@ -1088,8 +1340,16 @@ const styles = `
     }
 
     .product-category {
-      font-size: 0.60rem;
-      letter-spacing: 0.12em;
+      font-size: 0.58rem;
+      letter-spacing: 0.10em;
+    }
+
+    .premium-badge {
+      display: none;
+    }
+
+    .view-pill {
+      display: none;
     }
 
     .code {
@@ -1123,6 +1383,39 @@ const styles = `
       left: 8px;
       padding: 5px 8px;
       font-size: 0.62rem;
+    }
+
+    .product-modal-backdrop {
+      padding: 12px;
+      align-items: flex-end;
+    }
+
+    .product-modal {
+      grid-template-columns: 1fr;
+      max-height: 92vh;
+      border-radius: 28px 28px 0 0;
+    }
+
+    .modal-image-wrap {
+      min-height: 300px;
+      border-radius: 28px 28px 0 0;
+    }
+
+    .modal-image-wrap .product-image {
+      min-height: 300px;
+    }
+
+    .modal-info {
+      padding: 22px 18px 24px;
+      gap: 11px;
+    }
+
+    .modal-price strong {
+      font-size: 2rem;
+    }
+
+    .modal-whatsapp {
+      min-height: 52px;
     }
 
     .footer {
