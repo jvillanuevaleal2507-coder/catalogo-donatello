@@ -62,6 +62,16 @@ function ProductImage({ src, alt }) {
   );
 }
 
+
+function getProductImages(product) {
+  return [
+    product?.image_url,
+    product?.image_url_2,
+    product?.image_url_3,
+    product?.image_url_4,
+  ].filter((image) => Boolean(String(image || "").trim()));
+}
+
 export default function App() {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -69,6 +79,7 @@ export default function App() {
   const [searchTerm, setSearchTerm] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("Todas");
   const [selectedProduct, setSelectedProduct] = useState(null);
+  const [selectedImageIndex, setSelectedImageIndex] = useState(0);
 
   useEffect(() => {
     loadProducts();
@@ -80,7 +91,7 @@ export default function App() {
 
     const { data, error } = await supabase
       .from("products")
-      .select("id, code, name, category, price, stock, image_url")
+      .select("id, code, name, category, price, stock, image_url, image_url_2, image_url_3, image_url_4")
       .gt("stock", 0)
       .order("id", { ascending: false });
 
@@ -118,6 +129,36 @@ export default function App() {
       return matchesCategory && matchesSearch;
     });
   }, [products, searchTerm, categoryFilter]);
+
+  function openProduct(product, imageIndex = 0) {
+    setSelectedProduct(product);
+    setSelectedImageIndex(imageIndex);
+  }
+
+  function closeProduct() {
+    setSelectedProduct(null);
+    setSelectedImageIndex(0);
+  }
+
+  function moveSelectedImage(direction) {
+    if (!selectedProduct) return;
+
+    const images = getProductImages(selectedProduct);
+    if (images.length <= 1) return;
+
+    setSelectedImageIndex((currentIndex) => {
+      const nextIndex = currentIndex + direction;
+
+      if (nextIndex < 0) return images.length - 1;
+      if (nextIndex >= images.length) return 0;
+
+      return nextIndex;
+    });
+  }
+
+  const selectedImages = selectedProduct ? getProductImages(selectedProduct) : [];
+  const selectedImage =
+    selectedImages[selectedImageIndex] || selectedProduct?.image_url || "";
 
   return (
     <div className="app">
@@ -229,17 +270,26 @@ export default function App() {
             </div>
 
             <section className="product-grid">
-              {filteredProducts.map((product) => (
+              {filteredProducts.map((product) => {
+                const productImages = getProductImages(product);
+                const extraImagesCount = Math.max(productImages.length - 1, 0);
+
+                return (
                 <article className="product-card" key={product.id}>
                   <button
                     className="image-wrap image-action"
                     type="button"
-                    onClick={() => setSelectedProduct(product)}
-                    aria-label={`Ver detalle de ${product.name}`}
+                    onClick={() => openProduct(product, 0)}
+                    aria-label={`Ver galería de ${product.name}`}
                   >
-                    <ProductImage src={product.image_url} alt={product.name} />
+                    <ProductImage src={productImages[0] || product.image_url} alt={product.name} />
                     <span className="stock-pill">Disponible</span>
-                    <span className="view-pill">Ver detalle</span>
+                    <span className="view-pill">
+                      {productImages.length > 1 ? `${productImages.length} fotos` : "Ver detalle"}
+                    </span>
+                    {extraImagesCount > 0 && (
+                      <span className="gallery-pill">+{extraImagesCount} fotos</span>
+                    )}
                   </button>
 
                   <div className="product-body">
@@ -276,7 +326,8 @@ export default function App() {
 </a>
                   </div>
                 </article>
-              ))}
+                );
+              })}
             </section>
           </>
         )}
@@ -288,20 +339,68 @@ export default function App() {
           role="dialog"
           aria-modal="true"
           aria-label={`Detalle de ${selectedProduct.name}`}
-          onClick={() => setSelectedProduct(null)}
+          onClick={closeProduct}
         >
           <div className="product-modal" onClick={(event) => event.stopPropagation()}>
             <button
               className="modal-close"
               type="button"
-              onClick={() => setSelectedProduct(null)}
+              onClick={closeProduct}
               aria-label="Cerrar detalle"
             >
               ×
             </button>
 
-            <div className="modal-image-wrap">
-              <ProductImage src={selectedProduct.image_url} alt={selectedProduct.name} />
+            <div className="modal-gallery">
+              <div className="modal-image-wrap">
+                <ProductImage src={selectedImage} alt={selectedProduct.name} />
+
+                {selectedImages.length > 1 && (
+                  <>
+                    <button
+                      className="gallery-nav gallery-nav-left"
+                      type="button"
+                      onClick={() => moveSelectedImage(-1)}
+                      aria-label="Imagen anterior"
+                    >
+                      ‹
+                    </button>
+
+                    <button
+                      className="gallery-nav gallery-nav-right"
+                      type="button"
+                      onClick={() => moveSelectedImage(1)}
+                      aria-label="Imagen siguiente"
+                    >
+                      ›
+                    </button>
+
+                    <span className="gallery-counter">
+                      {selectedImageIndex + 1} / {selectedImages.length}
+                    </span>
+                  </>
+                )}
+              </div>
+
+              {selectedImages.length > 1 && (
+                <div className="modal-thumbnails">
+                  {selectedImages.map((image, index) => (
+                    <button
+                      key={`${image}-${index}`}
+                      className={
+                        selectedImageIndex === index
+                          ? "modal-thumb active"
+                          : "modal-thumb"
+                      }
+                      type="button"
+                      onClick={() => setSelectedImageIndex(index)}
+                      aria-label={`Ver imagen ${index + 1}`}
+                    >
+                      <img src={image} alt={`${selectedProduct.name} ${index + 1}`} />
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
 
             <div className="modal-info">
@@ -849,7 +948,9 @@ const styles = `
 
   .image-action:focus-visible,
   .modal-close:focus-visible,
-  .modal-whatsapp:focus-visible {
+  .modal-whatsapp:focus-visible,
+  .gallery-nav:focus-visible,
+  .modal-thumb:focus-visible {
     outline: 4px solid rgba(230,195,122,.55);
     outline-offset: 3px;
   }
@@ -914,6 +1015,21 @@ const styles = `
     opacity: 1;
     transform: translateY(0);
   }
+
+  .gallery-pill {
+    position: absolute;
+    left: 13px;
+    bottom: 13px;
+    padding: 8px 12px;
+    border-radius: 999px;
+    background: rgba(7,20,15,.88);
+    color: var(--cream);
+    font-size: .72rem;
+    font-weight: 950;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 10px 22px rgba(0,0,0,.20);
+  }
+
 
   .product-body {
     position: relative;
@@ -1050,13 +1166,21 @@ const styles = `
     box-shadow: 0 12px 28px rgba(0,0,0,.22);
   }
 
-  .modal-image-wrap {
-    min-height: 520px;
+  .modal-gallery {
     background:
       radial-gradient(circle at center, rgba(230,195,122,.18), transparent 58%),
       rgba(15,44,33,.08);
-    overflow: hidden;
     border-radius: 34px 0 0 34px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .modal-image-wrap {
+    position: relative;
+    min-height: 520px;
+    overflow: hidden;
+    flex: 1;
   }
 
   .modal-image-wrap .product-image {
@@ -1064,6 +1188,80 @@ const styles = `
     height: 100%;
     min-height: 520px;
     object-fit: cover;
+  }
+
+  .gallery-nav {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 46px;
+    height: 46px;
+    border: 0;
+    border-radius: 999px;
+    background: rgba(7,20,15,.88);
+    color: var(--cream);
+    font-size: 2.3rem;
+    line-height: 1;
+    cursor: pointer;
+    box-shadow: 0 14px 28px rgba(0,0,0,.22);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .gallery-nav-left {
+    left: 14px;
+  }
+
+  .gallery-nav-right {
+    right: 14px;
+  }
+
+  .gallery-counter {
+    position: absolute;
+    right: 14px;
+    bottom: 14px;
+    padding: 8px 12px;
+    border-radius: 999px;
+    background: rgba(7,20,15,.88);
+    color: var(--cream);
+    font-size: .78rem;
+    font-weight: 950;
+    backdrop-filter: blur(10px);
+  }
+
+  .modal-thumbnails {
+    display: flex;
+    gap: 10px;
+    padding: 12px;
+    background: rgba(7,20,15,.09);
+    overflow-x: auto;
+  }
+
+  .modal-thumb {
+    flex: 0 0 76px;
+    width: 76px;
+    height: 76px;
+    border: 2px solid transparent;
+    border-radius: 16px;
+    padding: 0;
+    overflow: hidden;
+    background: white;
+    cursor: pointer;
+    opacity: .72;
+  }
+
+  .modal-thumb.active {
+    opacity: 1;
+    border-color: var(--gold);
+    box-shadow: 0 0 0 3px rgba(185,135,49,.18);
+  }
+
+  .modal-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
   }
 
   .modal-info {
@@ -1352,6 +1550,14 @@ const styles = `
       display: none;
     }
 
+    .gallery-pill {
+      left: auto;
+      right: 8px;
+      bottom: 8px;
+      padding: 5px 8px;
+      font-size: .62rem;
+    }
+
     .code {
       display: none;
     }
@@ -1396,13 +1602,34 @@ const styles = `
       border-radius: 28px 28px 0 0;
     }
 
+    .modal-gallery {
+      border-radius: 28px 28px 0 0;
+    }
+
     .modal-image-wrap {
       min-height: 300px;
-      border-radius: 28px 28px 0 0;
     }
 
     .modal-image-wrap .product-image {
       min-height: 300px;
+    }
+
+    .gallery-nav {
+      width: 38px;
+      height: 38px;
+      font-size: 1.9rem;
+    }
+
+    .modal-thumbnails {
+      padding: 9px;
+      gap: 8px;
+    }
+
+    .modal-thumb {
+      flex-basis: 58px;
+      width: 58px;
+      height: 58px;
+      border-radius: 12px;
     }
 
     .modal-info {
