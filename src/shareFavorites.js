@@ -23,6 +23,8 @@ function encodeSelection(items) {
   const compact = items.map((item) => ({
     name: String(item.name || "").trim(),
     price: String(item.price || "").trim(),
+    code: String(item.code || "").trim(),
+    image: String(item.image || "").trim(),
   }));
 
   const json = JSON.stringify(compact);
@@ -53,8 +55,8 @@ function decodeSelection(value) {
       .map((item) => ({
         name: String(item.name || "").trim(),
         price: String(item.price || "").trim(),
-        code: "",
-        image: "",
+        code: String(item.code || "").trim(),
+        image: String(item.image || "").trim(),
       }));
   } catch {
     return [];
@@ -67,12 +69,30 @@ function buildShareUrl(items) {
   return url.toString();
 }
 
+function openFavoritesDrawer() {
+  const tryOpen = (attempt = 0) => {
+    const root = document.getElementById("donatello-favorites-root");
+    if (root) {
+      root.classList.add("drawer-open");
+      return;
+    }
+
+    if (attempt < 20) {
+      setTimeout(() => tryOpen(attempt + 1), 100);
+    }
+  };
+
+  setTimeout(() => tryOpen(), 180);
+}
+
 function importSharedSelection() {
   const url = new URL(window.location.href);
   const encoded = url.searchParams.get(SHARE_PARAM);
-  if (!encoded) return;
+  if (!encoded) return false;
 
   const sharedItems = decodeSelection(encoded);
+  let imported = false;
+
   if (sharedItems.length) {
     const current = readFavorites();
     const merged = [...current];
@@ -89,6 +109,8 @@ function importSharedSelection() {
           ...merged[existingIndex],
           name: merged[existingIndex].name || item.name,
           price: merged[existingIndex].price || item.price,
+          code: merged[existingIndex].code || item.code,
+          image: merged[existingIndex].image || item.image,
         };
       } else {
         merged.push(item);
@@ -96,11 +118,15 @@ function importSharedSelection() {
     });
 
     writeFavorites(merged);
+    imported = true;
   }
 
   url.searchParams.delete(SHARE_PARAM);
   const cleanUrl = `${url.pathname}${url.search}${url.hash}`;
   window.history.replaceState(window.history.state, "", cleanUrl || "/");
+
+  if (imported) openFavoritesDrawer();
+  return imported;
 }
 
 function buildFriendlyShareText(items, shareUrl) {
