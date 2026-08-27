@@ -69,10 +69,13 @@ function refreshHearts() {
     if (!item) return;
 
     const active = isFavorite(item);
-    button.textContent = heartMarkup(active);
+    const nextText = heartMarkup(active);
+    if (button.textContent !== nextText) button.textContent = nextText;
     button.classList.toggle("is-favorite", active);
-    button.setAttribute("aria-label", active ? "Quitar de favoritos" : "Agregar a favoritos");
-    button.title = active ? "Quitar de favoritos" : "Agregar a favoritos";
+
+    const label = active ? "Quitar de favoritos" : "Agregar a favoritos";
+    if (button.getAttribute("aria-label") !== label) button.setAttribute("aria-label", label);
+    if (button.title !== label) button.title = label;
   });
 }
 
@@ -249,13 +252,36 @@ function sync() {
 export function initDonatelloFavorites() {
   injectStyles();
   renderDrawer();
-  sync();
+
+  let syncTimer = null;
+  const scheduleSync = () => {
+    clearTimeout(syncTimer);
+    syncTimer = setTimeout(sync, 80);
+  };
+
+  scheduleSync();
 
   window.addEventListener("donatello:favorites-changed", () => {
     renderDrawer();
-    sync();
+    scheduleSync();
   });
 
-  const observer = new MutationObserver(() => sync());
-  observer.observe(document.body, { childList: true, subtree: true });
+  const observer = new MutationObserver((mutations) => {
+    const hasRelevantAddition = mutations.some((mutation) =>
+      Array.from(mutation.addedNodes || []).some((node) => {
+        if (!(node instanceof Element)) return false;
+        return (
+          node.matches?.(".product-card, .product-modal") ||
+          node.querySelector?.(".product-card, .product-modal")
+        );
+      })
+    );
+
+    if (hasRelevantAddition) scheduleSync();
+  });
+
+  observer.observe(document.getElementById("root") || document.body, {
+    childList: true,
+    subtree: true,
+  });
 }
