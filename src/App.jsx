@@ -28,6 +28,14 @@ function normalizeCategory(value) {
     .replace(/\b\w/g, (letter) => letter.toUpperCase());
 }
 
+function normalizeSearchText(value) {
+  return String(value || "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .trim();
+}
+
 function buildWhatsAppLink(product) {
   const message = `Hola, me interesa este producto de Ventas Donatello:\n\nProducto: ${product.name}\nCódigo: ${product.code}\nPrecio: ${money(product.price)}\n\n¿Me puedes dar más información?`;
 
@@ -120,7 +128,7 @@ export default function App() {
   }, [products]);
 
   const filteredProducts = useMemo(() => {
-    const query = searchTerm.trim().toLowerCase();
+    const query = normalizeSearchText(searchTerm);
 
     return products.filter((product) => {
       const normalizedCategory = normalizeCategory(product.category);
@@ -128,9 +136,10 @@ export default function App() {
       const matchesCategory =
         categoryFilter === "Todas" || normalizedCategory === categoryFilter;
 
-      const matchesSearch = `${product.name || ""} ${product.code || ""} ${normalizedCategory}`
-        .toLowerCase()
-        .includes(query);
+      const searchText = normalizeSearchText(
+        `${product.name || ""} ${product.code || ""} ${normalizedCategory}`
+      );
+      const matchesSearch = searchText.includes(query);
 
       return matchesCategory && matchesSearch;
     });
