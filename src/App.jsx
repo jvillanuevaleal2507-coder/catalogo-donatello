@@ -76,96 +76,58 @@ function getProductImages(product) {
 
 const AMBIENT_BLUEPRINTS = [
   {
-    key: "vanity",
-    title: "Vanity",
-    subtitle: "Un rincón práctico y bonito",
-    description: "Combina piezas reales del catálogo para armar un espacio de arreglo sin comprar todo de golpe.",
-    slots: [
-      { include: ["espejo"], exclude: ["alfombra", "lampara", "lámpara"] },
-      { include: ["ottoman", "banco", "puff"], exclude: ["silla", "mesa"] },
-      { include: ["alfombra"], exclude: ["silla", "mesa"] },
-      { include: ["lampara", "lámpara"], exclude: ["silla", "mesa"] },
-    ],
+    key: "vanity-claro",
+    title: "Vanity claro",
+    subtitle: "Un rincón ligero y práctico",
+    description: "Blanco, dorado y luz cálida para un espacio de arreglo sencillo pero bien armado.",
+    productCodes: ["DON-000155", "DON-000010", "DON-000057", "DON-000134"],
+    complementCodes: ["DON-000154", "DON-000114"],
   },
   {
-    key: "comedor",
+    key: "comedor-calido",
     title: "Comedor cálido",
-    subtitle: "Piezas que se entienden entre sí",
-    description: "Sillas, mesa, iluminación y textura para visualizar el conjunto antes de llevártelo.",
-    slots: [
-      {
-        prefer: ["nalupatio"],
-        include: ["silla"],
-        exclude: ["boucle", "sherpa", "rosa", "oficina", "escritorio"],
-      },
-      {
-        include: ["mesa"],
-        exclude: ["silla", "banco", "ottoman", "lampara", "lámpara"],
-      },
-      { include: ["lampara", "lámpara"], exclude: ["silla", "mesa"] },
-      { include: ["alfombra"], exclude: ["silla", "mesa"] },
-    ],
+    subtitle: "Camel, madera y fibras naturales",
+    description: "Una combinación cálida para que las sillas sean protagonistas sin cargar demasiado el espacio.",
+    productCodes: ["DON-000150", "DON-000145", "DON-000111", "DON-000051"],
+    complementCodes: ["DON-000070", "DON-000113"],
   },
   {
-    key: "rincon",
-    title: "Rincón para descansar",
-    subtitle: "Algo cómodo sin llenar toda la sala",
-    description: "Un chaise o sillón acompañado de iluminación y accesorios para imaginar el espacio completo.",
-    slots: [
-      { include: ["chaise", "sillon", "sillón"], exclude: ["silla"] },
-      { include: ["lampara", "lámpara"], exclude: ["silla", "mesa"] },
-      { include: ["alfombra"], exclude: ["silla", "mesa"] },
-      {
-        prefer: ["mesa auxiliar", "mesa lateral"],
-        include: ["mesa"],
-        exclude: ["silla", "comedor"],
-      },
-    ],
+    key: "rincon-lectura",
+    title: "Rincón de lectura",
+    subtitle: "Cómodo, verde y relajado",
+    description: "Un espacio para leer, descansar o ver una serie con piezas que se sienten más de casa que de catálogo.",
+    productCodes: ["DON-000153", "DON-000148", "DON-000042", "DON-000135"],
+    complementCodes: ["DON-000049", "DON-000112"],
+  },
+  {
+    key: "sala-elegante",
+    title: "Sala elegante",
+    subtitle: "Gris, negro y detalles dorados",
+    description: "Una propuesta más sobria para un rincón de sala, recibidor amplio u oficina con un toque elegante.",
+    productCodes: ["DON-000152", "DON-000149", "DON-000043", "DON-000021"],
+    complementCodes: ["DON-000050", "DON-000014"],
+  },
+  {
+    key: "recamara-boho",
+    title: "Recámara boho",
+    subtitle: "Texturas naturales y luz suave",
+    description: "Una base sencilla para visualizar burós, iluminación y accesorios dentro de una recámara completa.",
+    productCodes: ["DON-000107", "DON-000120", "DON-000060", "DON-000025"],
+    complementCodes: ["DON-000006", "DON-000067"],
+  },
+  {
+    key: "entrada-recibidor",
+    title: "Entrada con personalidad",
+    subtitle: "La primera impresión también cuenta",
+    description: "Recibidor, espejo, luz y un corredor para armar una entrada útil sin llenarla de muebles.",
+    productCodes: ["DON-000054", "DON-000049", "DON-000067", "DON-000137"],
+    complementCodes: ["DON-000052", "DON-000033"],
   },
 ];
 
-function pickAmbientProducts(products, slots) {
-  const used = new Set();
-
-  return slots
-    .map((slot) => {
-      const include = slot.include || [];
-      const prefer = slot.prefer || [];
-      const exclude = slot.exclude || [];
-
-      const candidates = products.filter((product) => {
-        if (used.has(product.id)) return false;
-
-        const name = normalizeSearchText(product.name || "");
-        const category = normalizeSearchText(product.category || "");
-        const haystack = `${name} ${category}`;
-
-        const hasIncluded = include.some((keyword) =>
-          haystack.includes(normalizeSearchText(keyword))
-        );
-        const hasExcluded = exclude.some((keyword) =>
-          haystack.includes(normalizeSearchText(keyword))
-        );
-
-        return hasIncluded && !hasExcluded;
-      });
-
-      const preferred = candidates.find((product) => {
-        const haystack = normalizeSearchText(
-          `${product.name || ""} ${product.category || ""}`
-        );
-
-        return prefer.some((keyword) =>
-          haystack.includes(normalizeSearchText(keyword))
-        );
-      });
-
-      const match = preferred || candidates[0];
-
-      if (match) used.add(match.id);
-      return match;
-    })
-    .filter(Boolean);
+function pickProductsByCodes(products, codes) {
+  const byCode = new Map(products.map((product) => [product.code, product]));
+  return codes.map((code) => byCode.get(code)).filter(Boolean);
 }
 
 function buildAmbientWhatsAppLink(scene) {
@@ -301,7 +263,8 @@ export default function App() {
   const ambientScenes = useMemo(() => {
     return AMBIENT_BLUEPRINTS.map((blueprint) => ({
       ...blueprint,
-      products: pickAmbientProducts(products, blueprint.slots),
+      products: pickProductsByCodes(products, blueprint.productCodes),
+      complements: pickProductsByCodes(products, blueprint.complementCodes),
     })).filter((scene) => scene.products.length >= 2);
   }, [products]);
   const selectedImages = selectedProduct ? getProductImages(selectedProduct) : [];
@@ -438,6 +401,27 @@ export default function App() {
                         </button>
                       ))}
                     </div>
+
+                    {scene.complements.length > 0 && (
+                      <div className="ambient-complements">
+                        <span className="ambient-complements-title">
+                          También combina con
+                        </span>
+                        <div className="ambient-complements-list">
+                          {scene.complements.map((product) => (
+                            <button
+                              type="button"
+                              className="ambient-complement-chip"
+                              key={product.id}
+                              onClick={() => openProduct(product)}
+                            >
+                              <span>{product.name}</span>
+                              <strong>{money(product.price)}</strong>
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    )}
 
                     <div className="ambient-total">
                       <span>Total de referencia</span>
@@ -1808,4 +1792,49 @@ const styles = `
       height: 210px;
     }
   }
+
+  .ambient-complements {
+    padding: 12px 14px 2px;
+  }
+
+  .ambient-complements-title {
+    display: block;
+    margin-bottom: 8px;
+    color: var(--muted);
+    font-size: .72rem;
+    font-weight: 900;
+    letter-spacing: .05em;
+    text-transform: uppercase;
+  }
+
+  .ambient-complements-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+  }
+
+  .ambient-complement-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    max-width: 100%;
+    padding: 7px 9px;
+    border-radius: 999px;
+    border: 1px solid rgba(185,135,49,.28);
+    background: rgba(239,225,189,.34);
+    color: var(--green-deep);
+    cursor: pointer;
+    font-size: .72rem;
+  }
+
+  .ambient-complement-chip span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .ambient-complement-chip strong {
+    white-space: nowrap;
+  }
+
 `;
