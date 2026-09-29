@@ -81,10 +81,10 @@ const AMBIENT_BLUEPRINTS = [
     subtitle: "Un rincón práctico y bonito",
     description: "Combina piezas reales del catálogo para armar un espacio de arreglo sin comprar todo de golpe.",
     slots: [
-      ["espejo"],
-      ["ottoman", "banco", "puff"],
-      ["alfombra"],
-      ["lampara", "lámpara"],
+      { include: ["espejo"], exclude: ["alfombra", "lampara", "lámpara"] },
+      { include: ["ottoman", "banco", "puff"], exclude: ["silla", "mesa"] },
+      { include: ["alfombra"], exclude: ["silla", "mesa"] },
+      { include: ["lampara", "lámpara"], exclude: ["silla", "mesa"] },
     ],
   },
   {
@@ -93,10 +93,17 @@ const AMBIENT_BLUEPRINTS = [
     subtitle: "Piezas que se entienden entre sí",
     description: "Sillas, mesa, iluminación y textura para visualizar el conjunto antes de llevártelo.",
     slots: [
-      ["nalupatio", "silla"],
-      ["mesa", "comedor"],
-      ["lampara", "lámpara"],
-      ["alfombra"],
+      {
+        prefer: ["nalupatio"],
+        include: ["silla"],
+        exclude: ["boucle", "sherpa", "rosa", "oficina", "escritorio"],
+      },
+      {
+        include: ["mesa"],
+        exclude: ["silla", "banco", "ottoman", "lampara", "lámpara"],
+      },
+      { include: ["lampara", "lámpara"], exclude: ["silla", "mesa"] },
+      { include: ["alfombra"], exclude: ["silla", "mesa"] },
     ],
   },
   {
@@ -105,10 +112,14 @@ const AMBIENT_BLUEPRINTS = [
     subtitle: "Algo cómodo sin llenar toda la sala",
     description: "Un chaise o sillón acompañado de iluminación y accesorios para imaginar el espacio completo.",
     slots: [
-      ["chaise", "sillon", "sillón"],
-      ["lampara", "lámpara"],
-      ["alfombra"],
-      ["mesa auxiliar", "mesa lateral", "mesa"],
+      { include: ["chaise", "sillon", "sillón"], exclude: ["silla"] },
+      { include: ["lampara", "lámpara"], exclude: ["silla", "mesa"] },
+      { include: ["alfombra"], exclude: ["silla", "mesa"] },
+      {
+        prefer: ["mesa auxiliar", "mesa lateral"],
+        include: ["mesa"],
+        exclude: ["silla", "comedor"],
+      },
     ],
   },
 ];
@@ -117,18 +128,39 @@ function pickAmbientProducts(products, slots) {
   const used = new Set();
 
   return slots
-    .map((keywords) => {
-      const match = products.find((product) => {
+    .map((slot) => {
+      const include = slot.include || [];
+      const prefer = slot.prefer || [];
+      const exclude = slot.exclude || [];
+
+      const candidates = products.filter((product) => {
         if (used.has(product.id)) return false;
 
+        const name = normalizeSearchText(product.name || "");
+        const category = normalizeSearchText(product.category || "");
+        const haystack = `${name} ${category}`;
+
+        const hasIncluded = include.some((keyword) =>
+          haystack.includes(normalizeSearchText(keyword))
+        );
+        const hasExcluded = exclude.some((keyword) =>
+          haystack.includes(normalizeSearchText(keyword))
+        );
+
+        return hasIncluded && !hasExcluded;
+      });
+
+      const preferred = candidates.find((product) => {
         const haystack = normalizeSearchText(
           `${product.name || ""} ${product.category || ""}`
         );
 
-        return keywords.some((keyword) =>
+        return prefer.some((keyword) =>
           haystack.includes(normalizeSearchText(keyword))
         );
       });
+
+      const match = preferred || candidates[0];
 
       if (match) used.add(match.id);
       return match;
