@@ -162,6 +162,7 @@ export default function App() {
   const [categoryFilter, setCategoryFilter] = useState("Todas");
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
+  const [selectedAmbient, setSelectedAmbient] = useState(null);
 
   useEffect(() => {
     loadProducts();
@@ -358,34 +359,6 @@ export default function App() {
                       <p>{scene.description}</p>
                     </div>
 
-                    {scene.visualScene ? (
-                      <div className="ambient-room-preview">
-                        <div className="ambient-room-label">
-                          <span>Vista del ambiente</span>
-                          <strong>Imagina estas piezas juntas en tu comedor</strong>
-                        </div>
-                        <div className="ambient-room-canvas">
-                          {scene.products.slice(0, 4).map((product, index) => (
-                            <button
-                              type="button"
-                              className={`ambient-room-piece piece-${index + 1}`}
-                              key={product.id}
-                              onClick={() => openProduct(product)}
-                              aria-label={`Ver ${product.name}`}
-                            >
-                              <ProductImage
-                                src={getProductImages(product)[0] || product.image_url}
-                                alt={product.name}
-                              />
-                              <span>{product.name}</span>
-                            </button>
-                          ))}
-                        </div>
-                        <p className="ambient-room-caption">
-                          Ambientación armada con las piezas disponibles de Donatello. Toca un mueble para ver su ficha real.
-                        </p>
-                      </div>
-                    ) : (
                     <div className="ambient-collage">
                       <button
                         type="button"
@@ -416,6 +389,18 @@ export default function App() {
                         ))}
                       </div>
                     </div>
+
+                    {scene.visualScene && (
+                      <button
+                        type="button"
+                        className="ambient-preview-btn"
+                        onClick={() => {
+                          setSelectedAmbient(scene);
+                          track("ambient_preview_open", { ambient: scene.key });
+                        }}
+                      >
+                        ✨ Ver cómo se vería el ambiente completo
+                      </button>
                     )}
 
                     <div className="ambient-products">
@@ -594,6 +579,68 @@ export default function App() {
           </>
         )}
       </main>
+
+      {selectedAmbient && (
+        <div
+          className="ambient-modal-backdrop"
+          role="dialog"
+          aria-modal="true"
+          aria-label={`Vista del ambiente ${selectedAmbient.title}`}
+          onClick={() => setSelectedAmbient(null)}
+        >
+          <div className="ambient-modal" onClick={(event) => event.stopPropagation()}>
+            <button
+              className="modal-close"
+              type="button"
+              onClick={() => setSelectedAmbient(null)}
+              aria-label="Cerrar vista del ambiente"
+            >
+              ×
+            </button>
+
+            <div className="ambient-modal-copy">
+              <span className="ambient-kicker">Idea Donatello</span>
+              <h2>{selectedAmbient.title}</h2>
+              <p>{selectedAmbient.description}</p>
+            </div>
+
+            <div className="ambient-modal-scene">
+              {selectedAmbient.products.slice(0, 4).map((product, index) => (
+                <button
+                  type="button"
+                  className={`ambient-room-piece piece-${index + 1}`}
+                  key={product.id}
+                  onClick={() => openProduct(product)}
+                  aria-label={`Ver ${product.name}`}
+                >
+                  <ProductImage
+                    src={getProductImages(product)[0] || product.image_url}
+                    alt={product.name}
+                  />
+                  <span>{product.name}</span>
+                </button>
+              ))}
+            </div>
+
+            <div className="ambient-modal-disclaimer">
+              Visualización de inspiración con las piezas seleccionadas. Las proporciones y el espacio pueden variar.
+            </div>
+
+            <div className="ambient-modal-products">
+              {selectedAmbient.products.map((product) => (
+                <button
+                  type="button"
+                  key={product.id}
+                  onClick={() => openProduct(product)}
+                >
+                  <span>{product.name}</span>
+                  <strong>{money(product.price)}</strong>
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
 
       {selectedProduct && (
         <div
@@ -972,6 +1019,130 @@ const styles = `
     .ambient-room-piece.piece-2 { width:59%; left:23%; }
     .ambient-room-piece.piece-1 { width:43%; left:1%; }
     .ambient-room-piece.piece-3 { width:34%; left:33%; }
+  }
+
+  .ambient-preview-btn {
+    width: 100%;
+    margin: 2px 0 14px;
+    border: 1px solid rgba(185,135,49,.48);
+    border-radius: 14px;
+    padding: 11px 14px;
+    background: linear-gradient(135deg, #fff8e8, #f2dfb5);
+    color: var(--green-deep);
+    font-weight: 900;
+    cursor: pointer;
+    transition: transform .18s ease, box-shadow .18s ease;
+  }
+  .ambient-preview-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 10px 20px rgba(45,28,13,.1);
+  }
+
+  .ambient-modal-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 80;
+    display: grid;
+    place-items: center;
+    padding: 22px;
+    background: rgba(4,15,11,.78);
+    backdrop-filter: blur(8px);
+  }
+  .ambient-modal {
+    width: min(980px, 96vw);
+    max-height: 92vh;
+    overflow: auto;
+    position: relative;
+    border-radius: 24px;
+    background: #fffaf0;
+    border: 1px solid rgba(185,135,49,.4);
+    box-shadow: 0 30px 90px rgba(0,0,0,.38);
+  }
+  .ambient-modal-copy {
+    padding: 24px 26px 14px;
+  }
+  .ambient-modal-copy h2 {
+    margin: 5px 0 7px;
+    color: var(--green-deep);
+    font-family: Georgia,"Times New Roman",serif;
+    font-size: clamp(1.55rem, 4vw, 2.15rem);
+  }
+  .ambient-modal-copy p {
+    margin: 0;
+    color: var(--muted);
+    line-height: 1.55;
+  }
+  .ambient-modal-scene {
+    min-height: 560px;
+    position: relative;
+    overflow: hidden;
+    margin: 0 24px;
+    border-radius: 20px;
+    background:
+      linear-gradient(90deg, transparent 0 13%, rgba(255,255,255,.48) 13% 14%, transparent 14% 86%, rgba(255,255,255,.34) 86% 87%, transparent 87%),
+      linear-gradient(180deg, #eee1cd 0 67%, #ba8b61 67% 69%, #cda57d 69% 100%);
+    box-shadow: inset 0 20px 70px rgba(255,255,255,.2);
+  }
+  .ambient-modal-scene::before {
+    content:"";
+    position:absolute;
+    width:26%;
+    height:48%;
+    left:7%;
+    top:8%;
+    border:10px solid rgba(255,250,238,.94);
+    background:linear-gradient(135deg,rgba(255,255,255,.95),rgba(205,224,215,.72));
+    box-shadow:0 12px 28px rgba(45,28,13,.14);
+  }
+  .ambient-modal-scene::after {
+    content:"";
+    position:absolute;
+    width:28%;
+    height:18%;
+    right:8%;
+    top:22%;
+    border-radius:4px;
+    background:linear-gradient(145deg,#9b765b,#d7b487 48%,#755642);
+    box-shadow:0 8px 20px rgba(45,28,13,.18);
+    opacity:.52;
+  }
+  .ambient-modal-scene .ambient-room-piece.piece-4 { width:82%; height:36%; left:9%; bottom:-1%; z-index:1; opacity:.9; }
+  .ambient-modal-scene .ambient-room-piece.piece-2 { width:52%; height:53%; left:25%; bottom:9%; z-index:3; }
+  .ambient-modal-scene .ambient-room-piece.piece-1 { width:36%; height:47%; left:6%; bottom:6%; z-index:4; }
+  .ambient-modal-scene .ambient-room-piece.piece-3 { width:28%; height:37%; left:36%; top:1%; z-index:5; }
+  .ambient-modal-disclaimer {
+    margin: 14px 24px 0;
+    padding: 10px 12px;
+    border-radius: 12px;
+    background: rgba(230,195,122,.18);
+    color: var(--muted);
+    font-size: .78rem;
+    line-height: 1.45;
+  }
+  .ambient-modal-products {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0,1fr));
+    gap: 10px;
+    padding: 14px 24px 26px;
+  }
+  .ambient-modal-products button {
+    display:flex;
+    justify-content:space-between;
+    gap:14px;
+    border:1px solid rgba(185,135,49,.3);
+    border-radius:12px;
+    background:white;
+    padding:11px 12px;
+    text-align:left;
+    cursor:pointer;
+  }
+  .ambient-modal-products span { color:var(--green-black); font-weight:700; }
+  .ambient-modal-products strong { color:var(--green-deep); white-space:nowrap; }
+  @media (max-width: 640px) {
+    .ambient-modal-backdrop { padding: 10px; }
+    .ambient-modal-scene { min-height: 360px; margin:0 12px; }
+    .ambient-modal-products { grid-template-columns:1fr; padding:12px; }
+    .ambient-modal-disclaimer { margin:12px 12px 0; }
   }
 
   .filters-card {
