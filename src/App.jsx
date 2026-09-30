@@ -171,6 +171,21 @@ function pickProductsByCodes(products, codes) {
   return codes.map((code) => byCode.get(code)).filter(Boolean);
 }
 
+function inferPiecesPerStockUnit(product) {
+  const name = String(product?.name || "").trim();
+
+  const setMatch = name.match(/\bset\s+de\s+(\d+)/i);
+  if (setMatch) return Number(setMatch[1]);
+
+  const pairMatch = name.match(/^par\s+de\b/i);
+  if (pairMatch) return 2;
+
+  const leadingNumberMatch = name.match(/^(\d+)\s+/);
+  if (leadingNumberMatch) return Number(leadingNumberMatch[1]);
+
+  return 1;
+}
+
 function buildAmbientWhatsAppLink(scene) {
   const available = scene.products.filter((product) => Number(product.stock || 0) > 0);
   const unavailable = scene.products.filter((product) => Number(product.stock || 0) <= 0);
@@ -315,13 +330,34 @@ export default function App() {
   }
 
   const ambientScenes = useMemo(() => {
-    return AMBIENT_BLUEPRINTS.map((blueprint) => ({
-      ...blueprint,
-      products: pickProductsByCodes(products, blueprint.productCodes),
-      complements: pickProductsByCodes(products, blueprint.complementCodes).filter(
-        (product) => Number(product.stock || 0) > 0
-      ),
-    })).filter((scene) => scene.products.length >= 2);
+    return AMBIENT_BLUEPRINTS.map((blueprint) => {
+      const sceneProducts = pickProductsByCodes(products, blueprint.productCodes);
+      const quantityWarnings = sceneProducts.flatMap((product) => {
+        const visualQuantity = Number(blueprint.visualQuantities?.[product.code] || 1);
+        const piecesPerStockUnit = inferPiecesPerStockUnit(product);
+        const availableVisualPieces =
+          Math.max(0, Number(product.stock || 0)) * piecesPerStockUnit;
+
+        if (visualQuantity <= availableVisualPieces) return [];
+
+        return [{
+          code: product.code,
+          name: product.name,
+          visualQuantity,
+          availableVisualPieces,
+        }];
+      });
+
+      return {
+        ...blueprint,
+        products: sceneProducts,
+        complements: pickProductsByCodes(products, blueprint.complementCodes).filter(
+          (product) => Number(product.stock || 0) > 0
+        ),
+        quantityWarnings,
+        quantityValid: quantityWarnings.length === 0,
+      };
+    }).filter((scene) => scene.products.length >= 2);
   }, [products]);
   const selectedImages = selectedProduct ? getProductImages(selectedProduct) : [];
   const selectedImage =
@@ -447,7 +483,7 @@ export default function App() {
                       </div>
                     </div>
 
-                    {scene.visualScene && (
+                    {scene.visualScene && scene.quantityValid && (
                       <button
                         type="button"
                         className="ambient-preview-btn"
@@ -458,6 +494,12 @@ export default function App() {
                       >
                         ✨ Ver cómo se vería el ambiente completo
                       </button>
+                    )}
+
+                    {scene.visualScene && !scene.quantityValid && (
+                      <div className="ambient-stock-warning">
+                        Ambiente actualizándose por disponibilidad
+                      </div>
                     )}
 
                     <div className="ambient-products">
