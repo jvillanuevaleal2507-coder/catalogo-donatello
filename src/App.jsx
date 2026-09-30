@@ -89,7 +89,7 @@ const AMBIENT_BLUEPRINTS = [
     subtitle: "Camel, madera y fibras naturales",
     description: "Una combinación cálida para que las sillas sean protagonistas sin cargar demasiado el espacio.",
     visualScene: true,
-    sceneImage: "/ambientes/comedor-calido.webp",
+    sceneImage: "https://lotgmhfqzthhhadavwlu.supabase.co/storage/v1/object/public/product-images/ambientes/comedor-calido-hd.jpg",
     productCodes: ["DON-000150", "DON-000145", "DON-000111", "DON-000051"],
     complementCodes: ["DON-000070", "DON-000113"],
   },
