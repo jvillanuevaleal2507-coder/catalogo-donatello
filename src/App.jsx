@@ -382,7 +382,7 @@ export default function App() {
                           ))}
                         </div>
                         <p className="ambient-room-caption">
-                          Visualización con piezas reales seleccionadas de Donatello. Toca cualquier pieza para verla a detalle.
+                          Ambientación armada con las piezas disponibles de Donatello. Toca un mueble para ver su ficha real.
                         </p>
                       </div>
                     ) : (
@@ -908,29 +908,70 @@ const styles = `
 
   .ambient-room-preview {
     margin: 16px 0;
-    border-radius: 20px;
+    border-radius: 22px;
     overflow: hidden;
     border: 1px solid rgba(185,135,49,.34);
-    background: linear-gradient(180deg, #f3e4c8 0 62%, #d8bea0 62% 100%);
-    box-shadow: inset 0 0 60px rgba(59,36,16,.08);
+    background: #ead9bf;
+    box-shadow: 0 18px 38px rgba(45,28,13,.14);
   }
-  .ambient-room-label { padding: 16px 18px 8px; }
+  .ambient-room-label { padding: 16px 18px 10px; background:rgba(255,250,240,.92); }
   .ambient-room-label span { display:block; color:var(--gold); font-size:.72rem; font-weight:900; text-transform:uppercase; letter-spacing:.1em; }
   .ambient-room-label strong { display:block; margin-top:4px; color:var(--green-deep); font-family:Georgia,"Times New Roman",serif; font-size:1.08rem; }
-  .ambient-room-canvas { min-height:330px; position:relative; overflow:hidden; }
-  .ambient-room-piece { position:absolute; border:0; padding:0; background:transparent; cursor:pointer; }
-  .ambient-room-piece .product-image { width:100%; height:100%; object-fit:contain; filter:drop-shadow(0 14px 12px rgba(30,20,10,.18)); }
-  .ambient-room-piece > span { position:absolute; left:50%; bottom:-24px; transform:translateX(-50%); width:max-content; max-width:170px; padding:5px 8px; border-radius:999px; background:rgba(7,20,15,.88); color:white; font-size:.62rem; font-weight:800; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-  .ambient-room-piece.piece-1 { width:31%; height:48%; left:7%; bottom:18%; z-index:4; }
-  .ambient-room-piece.piece-2 { width:44%; height:55%; left:30%; bottom:14%; z-index:3; }
-  .ambient-room-piece.piece-3 { width:27%; height:35%; right:5%; top:2%; z-index:2; }
-  .ambient-room-piece.piece-4 { width:72%; height:30%; left:14%; bottom:0; z-index:1; opacity:.86; }
-  .ambient-room-caption { margin:0; padding:10px 16px 14px; color:var(--muted); font-size:.76rem; line-height:1.45; background:rgba(255,250,240,.78); }
+  .ambient-room-canvas {
+    min-height:430px;
+    position:relative;
+    overflow:hidden;
+    background:
+      linear-gradient(90deg, transparent 0 12%, rgba(255,255,255,.44) 12% 13%, transparent 13% 87%, rgba(255,255,255,.35) 87% 88%, transparent 88%),
+      linear-gradient(180deg, #eee0c9 0 67%, #b9895e 67% 69%, #c99f78 69% 100%);
+    box-shadow: inset 0 30px 80px rgba(255,255,255,.22);
+  }
+  .ambient-room-canvas::before {
+    content:"";
+    position:absolute;
+    width:24%;
+    height:46%;
+    left:7%;
+    top:9%;
+    border:10px solid rgba(255,250,238,.92);
+    background:linear-gradient(135deg,rgba(255,255,255,.9),rgba(210,225,217,.72));
+    box-shadow:0 10px 25px rgba(45,28,13,.12);
+  }
+  .ambient-room-canvas::after {
+    content:"";
+    position:absolute;
+    width:32%;
+    height:18%;
+    right:7%;
+    top:25%;
+    border-radius:3px;
+    background:linear-gradient(145deg,#9b765b,#d7b487 48%,#755642);
+    box-shadow:0 7px 18px rgba(45,28,13,.18);
+    opacity:.62;
+  }
+  .ambient-room-piece { position:absolute; border:0; padding:0; background:transparent; cursor:pointer; transition:transform .18s ease; }
+  .ambient-room-piece:hover { transform:translateY(-3px) scale(1.015); }
+  .ambient-room-piece .product-image { width:100%; height:100%; object-fit:contain; filter:drop-shadow(0 18px 14px rgba(30,20,10,.25)); }
+  .ambient-room-piece > span {
+    position:absolute; left:50%; bottom:4px; transform:translateX(-50%);
+    width:max-content; max-width:180px; padding:6px 9px; border-radius:999px;
+    background:rgba(7,20,15,.84); color:white; font-size:.62rem; font-weight:800;
+    white-space:nowrap; overflow:hidden; text-overflow:ellipsis; opacity:0;
+    transition:opacity .18s ease;
+  }
+  .ambient-room-piece:hover > span { opacity:1; }
+  .ambient-room-piece.piece-4 { width:82%; height:37%; left:9%; bottom:-2%; z-index:1; opacity:.9; }
+  .ambient-room-piece.piece-2 { width:54%; height:52%; left:25%; bottom:8%; z-index:3; }
+  .ambient-room-piece.piece-1 { width:38%; height:48%; left:5%; bottom:5%; z-index:4; }
+  .ambient-room-piece.piece-3 { width:31%; height:39%; left:34%; top:-2%; z-index:5; }
+  .ambient-room-caption { margin:0; padding:11px 16px 14px; color:var(--muted); font-size:.76rem; line-height:1.45; background:rgba(255,250,240,.94); }
   @media (max-width: 640px) {
-    .ambient-room-canvas { min-height:260px; }
-    .ambient-room-piece.piece-1 { width:34%; left:4%; }
-    .ambient-room-piece.piece-2 { width:48%; left:27%; }
-    .ambient-room-piece.piece-3 { width:28%; right:2%; }
+    .ambient-room-canvas { min-height:315px; }
+    .ambient-room-canvas::before { width:28%; height:42%; left:5%; border-width:6px; }
+    .ambient-room-piece.piece-4 { width:92%; left:4%; }
+    .ambient-room-piece.piece-2 { width:59%; left:23%; }
+    .ambient-room-piece.piece-1 { width:43%; left:1%; }
+    .ambient-room-piece.piece-3 { width:34%; left:33%; }
   }
 
   .filters-card {
