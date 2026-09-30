@@ -133,10 +133,15 @@ function pickProductsByCodes(products, codes) {
 }
 
 function buildAmbientWhatsAppLink(scene) {
-  const lines = scene.products.map(
+  const available = scene.products.filter((product) => Number(product.stock || 0) > 0);
+  const unavailable = scene.products.filter((product) => Number(product.stock || 0) <= 0);
+  const lines = available.map(
     (product) => `• ${product.name} — ${money(product.price)}`
   );
-  const total = scene.products.reduce(
+  const unavailableLines = unavailable.map(
+    (product) => `• ${product.name} — agotado`
+  );
+  const total = available.reduce(
     (sum, product) => sum + Number(product.price || 0),
     0
   );
@@ -144,12 +149,15 @@ function buildAmbientWhatsAppLink(scene) {
   const message = [
     `Hola, me gustó la idea \"${scene.title}\" de Ambientes Donatello.`,
     "",
-    "Me interesan estas piezas:",
+    "Me interesan estas piezas disponibles:",
     ...lines,
+    ...(unavailableLines.length
+      ? ["", "En la idea también aparece:", ...unavailableLines]
+      : []),
     "",
-    `Total de referencia: ${money(total)}`,
+    `Total disponible de referencia: ${money(total)}`,
     "",
-    "¿Me ayudas a confirmar disponibilidad y cómo quedarían juntas?",
+    "¿Me ayudas a confirmar disponibilidad y, si algo se agotó, una alternativa que combine?",
   ].join("\n");
 
   return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
@@ -188,7 +196,6 @@ export default function App() {
     const { data, error } = await supabase
       .from("products")
       .select("id, code, name, category, price, stock, image_url, image_url_2, image_url_3, image_url_4")
-      .gt("stock", 0)
       .order("id", { ascending: false });
 
     if (error) {
@@ -201,18 +208,23 @@ export default function App() {
     setLoading(false);
   }
 
+  const availableProducts = useMemo(
+    () => products.filter((product) => Number(product.stock || 0) > 0),
+    [products]
+  );
+
   const categories = useMemo(() => {
     const unique = new Set(
-      products.map((product) => normalizeCategory(product.category))
+      availableProducts.map((product) => normalizeCategory(product.category))
     );
 
     return ["Todas", ...Array.from(unique).sort((a, b) => a.localeCompare(b))];
-  }, [products]);
+  }, [availableProducts]);
 
   const filteredProducts = useMemo(() => {
     const query = normalizeSearchText(searchTerm);
 
-    return products.filter((product) => {
+    return availableProducts.filter((product) => {
       const normalizedCategory = normalizeCategory(product.category);
 
       const matchesCategory =
@@ -225,7 +237,7 @@ export default function App() {
 
       return matchesCategory && matchesSearch;
     });
-  }, [products, searchTerm, categoryFilter]);
+  }, [availableProducts, searchTerm, categoryFilter]);
 
   function openProduct(product, imageIndex = 0) {
     window.history.pushState(
@@ -267,7 +279,9 @@ export default function App() {
     return AMBIENT_BLUEPRINTS.map((blueprint) => ({
       ...blueprint,
       products: pickProductsByCodes(products, blueprint.productCodes),
-      complements: pickProductsByCodes(products, blueprint.complementCodes),
+      complements: pickProductsByCodes(products, blueprint.complementCodes).filter(
+        (product) => Number(product.stock || 0) > 0
+      ),
     })).filter((scene) => scene.products.length >= 2);
   }, [products]);
   const selectedImages = selectedProduct ? getProductImages(selectedProduct) : [];
@@ -347,7 +361,10 @@ export default function App() {
             <div className="ambient-grid">
               {ambientScenes.map((scene) => {
                 const hero = scene.products[0];
-                const total = scene.products.reduce(
+                const availableSceneProducts = scene.products.filter(
+                  (product) => Number(product.stock || 0) > 0
+                );
+                const total = availableSceneProducts.reduce(
                   (sum, product) => sum + Number(product.price || 0),
                   0
                 );
@@ -405,17 +422,20 @@ export default function App() {
                     )}
 
                     <div className="ambient-products">
-                      {scene.products.map((product) => (
-                        <button
-                          type="button"
-                          className="ambient-product-row"
-                          key={product.id}
-                          onClick={() => openProduct(product)}
-                        >
-                          <span>{product.name}</span>
-                          <strong>{money(product.price)}</strong>
-                        </button>
-                      ))}
+                      {scene.products.map((product) => {
+                        const unavailable = Number(product.stock || 0) <= 0;
+                        return (
+                          <button
+                            type="button"
+                            className={`ambient-product-row${unavailable ? " unavailable" : ""}`}
+                            key={product.id}
+                            onClick={() => openProduct(product)}
+                          >
+                            <span>{product.name}</span>
+                            <strong>{unavailable ? "Agotado" : money(product.price)}</strong>
+                          </button>
+                        );
+                      })}
                     </div>
 
                     {scene.complements.length > 0 && (
@@ -440,7 +460,11 @@ export default function App() {
                     )}
 
                     <div className="ambient-total">
-                      <span>Total de referencia</span>
+                      <span>
+                        {availableSceneProducts.length === scene.products.length
+                          ? "Total de referencia"
+                          : "Total disponible"}
+                      </span>
                       <strong>{money(total)}</strong>
                     </div>
 
@@ -452,7 +476,7 @@ export default function App() {
                       onClick={() => {
                         track("ambient_whatsapp_click", {
                           ambient: scene.key,
-                          products: scene.products.length,
+                          products: availableSceneProducts.length,
                           total,
                         });
                       }}
@@ -2012,6 +2036,17 @@ const styles = `
     color: var(--green-deep);
     font-size: .82rem;
     white-space: nowrap;
+  }
+
+  .ambient-product-row.unavailable {
+    opacity: .62;
+  }
+
+  .ambient-product-row.unavailable strong {
+    color: #8a5a3a;
+    font-size: .74rem;
+    text-transform: uppercase;
+    letter-spacing: .03em;
   }
 
   .ambient-total {
