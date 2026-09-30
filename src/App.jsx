@@ -81,7 +81,7 @@ const AMBIENT_BLUEPRINTS = [
     subtitle: "Un rincón ligero y práctico",
     description: "Blanco, dorado y luz cálida para un espacio de arreglo sencillo pero bien armado.",
     visualScene: true,
-    sceneImage: "https://lotgmhfqzthhhadavwlu.supabase.co/storage/v1/object/public/product-images/ambientes/vanity-claro-final.png",
+    sceneImage: "https://lotgmhfqzthhhadavwlu.supabase.co/storage/v1/object/public/product-images/ambientes/vanity-claro-final-v2.png",
     productCodes: ["DON-000155", "DON-000010", "DON-000057", "DON-000134"],
     complementCodes: ["DON-000154", "DON-000114"],
   },
