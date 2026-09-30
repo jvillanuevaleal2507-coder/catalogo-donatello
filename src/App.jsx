@@ -1013,8 +1013,8 @@ const styles = `
   }
 
   .ambient-preview-btn {
-    width: 100%;
-    margin: 2px 0 14px;
+    width: calc(100% - 32px);
+    margin: 2px 16px 14px;
     border: 1px solid rgba(185,135,49,.48);
     border-radius: 14px;
     padding: 11px 14px;
@@ -1900,6 +1900,7 @@ const styles = `
   }
 
   .ambient-card {
+    min-width: 0;
     overflow: hidden;
     border-radius: 20px;
     background: #fffaf0;
@@ -1908,7 +1909,7 @@ const styles = `
   }
 
   .ambient-copy {
-    padding: 18px 18px 12px;
+    padding: 18px 16px 12px;
   }
 
   .ambient-copy > span {
@@ -1938,7 +1939,7 @@ const styles = `
     grid-template-columns: 1.55fr .75fr;
     gap: 5px;
     height: 235px;
-    padding: 0 10px;
+    padding: 0 16px;
   }
 
   .ambient-hero,
@@ -1976,18 +1977,20 @@ const styles = `
   }
 
   .ambient-products {
-    padding: 10px 14px 0;
+    min-width: 0;
+    padding: 10px 16px 0;
     display: grid;
     gap: 3px;
   }
 
   .ambient-product-row {
     width: 100%;
-    display: flex;
+    min-width: 0;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) max-content;
     align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-    padding: 8px 4px;
+    gap: 10px;
+    padding: 8px 0;
     border: 0;
     border-bottom: 1px solid rgba(185,135,49,.16);
     background: transparent;
@@ -1997,6 +2000,7 @@ const styles = `
   }
 
   .ambient-product-row span {
+    min-width: 0;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -2004,6 +2008,7 @@ const styles = `
   }
 
   .ambient-product-row strong {
+    justify-self: end;
     color: var(--green-deep);
     font-size: .82rem;
     white-space: nowrap;
@@ -2014,7 +2019,7 @@ const styles = `
     align-items: center;
     justify-content: space-between;
     gap: 12px;
-    padding: 14px 18px 8px;
+    padding: 14px 16px 8px;
     color: var(--green-deep);
   }
 
@@ -2029,7 +2034,7 @@ const styles = `
 
   .ambient-whatsapp {
     display: block;
-    margin: 8px 14px 16px;
+    margin: 8px 16px 16px;
     padding: 11px 14px;
     border-radius: 12px;
     text-align: center;
@@ -2073,7 +2078,7 @@ const styles = `
   }
 
   .ambient-complements {
-    padding: 12px 14px 2px;
+    padding: 12px 16px 2px;
   }
 
   .ambient-complements-title {
