@@ -89,6 +89,7 @@ const AMBIENT_BLUEPRINTS = [
     subtitle: "Camel, madera y fibras naturales",
     description: "Una combinación cálida para que las sillas sean protagonistas sin cargar demasiado el espacio.",
     visualScene: true,
+    sceneImage: "/ambientes/comedor-calido.webp",
     productCodes: ["DON-000150", "DON-000145", "DON-000111", "DON-000051"],
     complementCodes: ["DON-000070", "DON-000113"],
   },
@@ -604,26 +605,16 @@ export default function App() {
               <p>{selectedAmbient.description}</p>
             </div>
 
-            <div className="ambient-modal-scene">
-              {selectedAmbient.products.slice(0, 4).map((product, index) => (
-                <button
-                  type="button"
-                  className={`ambient-room-piece piece-${index + 1}`}
-                  key={product.id}
-                  onClick={() => openProduct(product)}
-                  aria-label={`Ver ${product.name}`}
-                >
-                  <ProductImage
-                    src={getProductImages(product)[0] || product.image_url}
-                    alt={product.name}
-                  />
-                  <span>{product.name}</span>
-                </button>
-              ))}
+            <div className="ambient-modal-photo-wrap">
+              <img
+                className="ambient-modal-photo"
+                src={selectedAmbient.sceneImage}
+                alt={`Visualización de inspiración: ${selectedAmbient.title}`}
+              />
             </div>
 
             <div className="ambient-modal-disclaimer">
-              Visualización de inspiración con las piezas seleccionadas. Las proporciones y el espacio pueden variar.
+              <strong>Visualización de inspiración.</strong> Esta ambientación ayuda a imaginar la combinación completa; algunos detalles, escala y proporciones pueden variar respecto a las piezas reales. Consulta abajo las fotos y fichas de los productos disponibles.
             </div>
 
             <div className="ambient-modal-products">
@@ -1072,6 +1063,24 @@ const styles = `
     color: var(--muted);
     line-height: 1.55;
   }
+  .ambient-modal-photo-wrap {
+    margin: 0 24px;
+    border-radius: 20px;
+    overflow: hidden;
+    background: #ead9bf;
+    box-shadow: 0 18px 42px rgba(45,28,13,.18);
+  }
+  .ambient-modal-photo {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+    display: block;
+  }
+  .ambient-modal-disclaimer strong {
+    color: var(--green-deep);
+  }
+
   .ambient-modal-scene {
     min-height: 560px;
     position: relative;
@@ -1140,6 +1149,7 @@ const styles = `
   .ambient-modal-products strong { color:var(--green-deep); white-space:nowrap; }
   @media (max-width: 640px) {
     .ambient-modal-backdrop { padding: 10px; }
+    .ambient-modal-photo-wrap { margin: 0 12px; border-radius: 14px; }
     .ambient-modal-scene { min-height: 360px; margin:0 12px; }
     .ambient-modal-products { grid-template-columns:1fr; padding:12px; }
     .ambient-modal-disclaimer { margin:12px 12px 0; }
