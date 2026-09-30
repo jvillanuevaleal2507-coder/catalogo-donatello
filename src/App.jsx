@@ -82,7 +82,12 @@ const AMBIENT_BLUEPRINTS = [
     description: "Blanco, dorado y luz cálida para un espacio de arreglo sencillo pero bien armado.",
     visualScene: true,
     sceneImage: "https://lotgmhfqzthhhadavwlu.supabase.co/storage/v1/object/public/product-images/ambientes/vanity-claro-final-v2.png",
-    productCodes: ["DON-000155", "DON-000010", "DON-000057", "DON-000134"],
+    productCodes: ["DON-000155", "DON-000010", "DON-000057"],
+    visualQuantities: {
+      "DON-000155": 1,
+      "DON-000010": 1,
+      "DON-000057": 1,
+    },
     complementCodes: ["DON-000154", "DON-000114"],
   },
   {
@@ -91,8 +96,14 @@ const AMBIENT_BLUEPRINTS = [
     subtitle: "Camel, madera y fibras naturales",
     description: "Una combinación cálida para que las sillas sean protagonistas sin cargar demasiado el espacio.",
     visualScene: true,
-    sceneImage: "https://lotgmhfqzthhhadavwlu.supabase.co/storage/v1/object/public/product-images/ambientes/comedor-calido-hd.jpg",
+    sceneImage: "https://lotgmhfqzthhhadavwlu.supabase.co/storage/v1/object/public/product-images/ambientes/comedor-calido-stock-v2.png",
     productCodes: ["DON-000150", "DON-000145", "DON-000111", "DON-000051"],
+    visualQuantities: {
+      "DON-000150": 2,
+      "DON-000145": 1,
+      "DON-000111": 1,
+      "DON-000051": 1,
+    },
     complementCodes: ["DON-000070", "DON-000113"],
   },
   {
@@ -103,6 +114,12 @@ const AMBIENT_BLUEPRINTS = [
     visualScene: true,
     sceneImage: "https://lotgmhfqzthhhadavwlu.supabase.co/storage/v1/object/public/product-images/ambientes/rincon-lectura-hd.png",
     productCodes: ["DON-000153", "DON-000148", "DON-000042", "DON-000135"],
+    visualQuantities: {
+      "DON-000153": 1,
+      "DON-000148": 1,
+      "DON-000042": 1,
+      "DON-000135": 1,
+    },
     complementCodes: ["DON-000049", "DON-000112"],
   },
   {
@@ -111,6 +128,12 @@ const AMBIENT_BLUEPRINTS = [
     subtitle: "Gris, negro y detalles dorados",
     description: "Una propuesta más sobria para un rincón de sala, recibidor amplio u oficina con un toque elegante.",
     productCodes: ["DON-000152", "DON-000149", "DON-000043", "DON-000021"],
+    visualQuantities: {
+      "DON-000152": 1,
+      "DON-000149": 1,
+      "DON-000043": 1,
+      "DON-000021": 1,
+    },
     complementCodes: ["DON-000050", "DON-000014"],
   },
   {
@@ -119,6 +142,12 @@ const AMBIENT_BLUEPRINTS = [
     subtitle: "Texturas naturales y luz suave",
     description: "Una base sencilla para visualizar burós, iluminación y accesorios dentro de una recámara completa.",
     productCodes: ["DON-000107", "DON-000120", "DON-000060", "DON-000025"],
+    visualQuantities: {
+      "DON-000107": 1,
+      "DON-000120": 2,
+      "DON-000060": 2,
+      "DON-000025": 1,
+    },
     complementCodes: ["DON-000006", "DON-000067"],
   },
   {
@@ -127,6 +156,12 @@ const AMBIENT_BLUEPRINTS = [
     subtitle: "La primera impresión también cuenta",
     description: "Recibidor, espejo, luz y un corredor para armar una entrada útil sin llenarla de muebles.",
     productCodes: ["DON-000054", "DON-000049", "DON-000067", "DON-000137"],
+    visualQuantities: {
+      "DON-000054": 1,
+      "DON-000049": 1,
+      "DON-000067": 1,
+      "DON-000137": 1,
+    },
     complementCodes: ["DON-000052", "DON-000033"],
   },
 ];
