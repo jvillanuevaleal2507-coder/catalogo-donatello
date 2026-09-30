@@ -1163,6 +1163,19 @@ const styles = `
     box-shadow: 0 10px 20px rgba(45,28,13,.1);
   }
 
+  .ambient-stock-warning {
+    width: calc(100% - 32px);
+    margin: 2px 16px 14px;
+    border: 1px solid rgba(185,135,49,.38);
+    border-radius: 14px;
+    padding: 11px 14px;
+    background: rgba(185,135,49,.10);
+    color: #7a5324;
+    font-size: .9rem;
+    font-weight: 800;
+    text-align: center;
+  }
+
   .ambient-modal-backdrop {
     position: fixed;
     inset: 0;
