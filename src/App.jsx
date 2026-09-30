@@ -382,7 +382,7 @@ export default function App() {
                           ))}
                         </div>
                         <p className="ambient-room-caption">
-                          Visualización con las piezas reales seleccionadas de Donatello. Toca una pieza para verla a detalle.
+                          Visualización con piezas reales seleccionadas de Donatello. Toca cualquier pieza para verla a detalle.
                         </p>
                       </div>
                     ) : (
