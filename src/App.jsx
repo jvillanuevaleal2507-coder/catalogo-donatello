@@ -127,6 +127,8 @@ const AMBIENT_BLUEPRINTS = [
     title: "Sala elegante",
     subtitle: "Gris, negro y detalles dorados",
     description: "Una propuesta más sobria para un rincón de sala, recibidor amplio u oficina con un toque elegante.",
+    visualScene: true,
+    sceneImage: "https://lotgmhfqzthhhadavwlu.supabase.co/storage/v1/object/public/product-images/ambientes/sala-elegante-final.png",
     productCodes: ["DON-000152", "DON-000149", "DON-000043", "DON-000021"],
     visualQuantities: {
       "DON-000152": 1,
@@ -141,6 +143,8 @@ const AMBIENT_BLUEPRINTS = [
     title: "Recámara boho",
     subtitle: "Texturas naturales y luz suave",
     description: "Una base sencilla para visualizar burós, iluminación y accesorios dentro de una recámara completa.",
+    visualScene: true,
+    sceneImage: "https://lotgmhfqzthhhadavwlu.supabase.co/storage/v1/object/public/product-images/ambientes/recamara-boho-final.png",
     productCodes: ["DON-000107", "DON-000120", "DON-000060", "DON-000025"],
     visualQuantities: {
       "DON-000107": 1,
@@ -155,6 +159,8 @@ const AMBIENT_BLUEPRINTS = [
     title: "Entrada con personalidad",
     subtitle: "La primera impresión también cuenta",
     description: "Recibidor, espejo, luz y un corredor para armar una entrada útil sin llenarla de muebles.",
+    visualScene: true,
+    sceneImage: "https://lotgmhfqzthhhadavwlu.supabase.co/storage/v1/object/public/product-images/ambientes/entrada-personalidad-final.png",
     productCodes: ["DON-000054", "DON-000049", "DON-000067", "DON-000137"],
     visualQuantities: {
       "DON-000054": 1,
