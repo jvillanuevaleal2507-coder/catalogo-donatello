@@ -81,31 +81,7 @@ const AMBIENT_BLUEPRINTS = [
     subtitle: "Un rincón ligero y práctico",
     description: "Blanco, dorado y luz cálida para un espacio de arreglo sencillo pero bien armado.",
     visualScene: true,
-    sceneComposite: {
-      background: "https://lotgmhfqzthhhadavwlu.supabase.co/storage/v1/object/public/product-images/ambientes/work/vanity-photoroom-bg.png",
-      layers: [
-        {
-          key: "rug",
-          src: "https://lotgmhfqzthhhadavwlu.supabase.co/storage/v1/object/public/product-images/ambientes/work/vanity-live-rug.png",
-          productCode: "DON-000134",
-        },
-        {
-          key: "mirror",
-          src: "https://lotgmhfqzthhhadavwlu.supabase.co/storage/v1/object/public/product-images/ambientes/work/vanity-live-mirror.png",
-          productCode: "DON-000010",
-        },
-        {
-          key: "lamp",
-          src: "https://lotgmhfqzthhhadavwlu.supabase.co/storage/v1/object/public/product-images/ambientes/work/vanity-live-lamp.png",
-          productCode: "DON-000057",
-        },
-        {
-          key: "ottoman",
-          src: "https://lotgmhfqzthhhadavwlu.supabase.co/storage/v1/object/public/product-images/ambientes/work/vanity-live-ottoman.png",
-          productCode: "DON-000155",
-        },
-      ],
-    },
+    sceneImage: "https://lotgmhfqzthhhadavwlu.supabase.co/storage/v1/object/public/product-images/ambientes/vanity-claro-final.png",
     productCodes: ["DON-000155", "DON-000010", "DON-000057", "DON-000134"],
     complementCodes: ["DON-000154", "DON-000114"],
   },
