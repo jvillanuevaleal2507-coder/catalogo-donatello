@@ -81,7 +81,31 @@ const AMBIENT_BLUEPRINTS = [
     subtitle: "Un rincón ligero y práctico",
     description: "Blanco, dorado y luz cálida para un espacio de arreglo sencillo pero bien armado.",
     visualScene: true,
-    sceneImage: "https://lotgmhfqzthhhadavwlu.supabase.co/storage/v1/object/public/product-images/ambientes/vanity-claro-hd.png",
+    sceneComposite: {
+      background: "https://lotgmhfqzthhhadavwlu.supabase.co/storage/v1/object/public/product-images/ambientes/work/vanity-photoroom-bg.png",
+      layers: [
+        {
+          key: "rug",
+          src: "https://lotgmhfqzthhhadavwlu.supabase.co/storage/v1/object/public/product-images/ambientes/work/vanity-live-rug.png",
+          productCode: "DON-000134",
+        },
+        {
+          key: "mirror",
+          src: "https://lotgmhfqzthhhadavwlu.supabase.co/storage/v1/object/public/product-images/ambientes/work/vanity-live-mirror.png",
+          productCode: "DON-000010",
+        },
+        {
+          key: "lamp",
+          src: "https://lotgmhfqzthhhadavwlu.supabase.co/storage/v1/object/public/product-images/ambientes/work/vanity-live-lamp.png",
+          productCode: "DON-000057",
+        },
+        {
+          key: "ottoman",
+          src: "https://lotgmhfqzthhhadavwlu.supabase.co/storage/v1/object/public/product-images/ambientes/work/vanity-live-ottoman.png",
+          productCode: "DON-000155",
+        },
+      ],
+    },
     productCodes: ["DON-000155", "DON-000010", "DON-000057", "DON-000134"],
     complementCodes: ["DON-000154", "DON-000114"],
   },
@@ -633,16 +657,45 @@ export default function App() {
               <p>{selectedAmbient.description}</p>
             </div>
 
-            <div className="ambient-modal-photo-wrap">
-              <img
-                className="ambient-modal-photo"
-                src={selectedAmbient.sceneImage}
-                alt={`Visualización de inspiración: ${selectedAmbient.title}`}
-              />
-            </div>
+            {selectedAmbient.sceneComposite ? (
+              <div className="ambient-composite-photo" aria-label={`Ambientación ${selectedAmbient.title}`}>
+                <img
+                  className="ambient-composite-bg"
+                  src={selectedAmbient.sceneComposite.background}
+                  alt=""
+                />
+                {selectedAmbient.sceneComposite.layers.map((layer) => (
+                  <img
+                    key={layer.key}
+                    className={`ambient-composite-layer ambient-composite-${layer.key}`}
+                    src={layer.src}
+                    alt={
+                      selectedAmbient.products.find((product) => product.code === layer.productCode)?.name ||
+                      layer.key
+                    }
+                  />
+                ))}
+              </div>
+            ) : (
+              <div className="ambient-modal-photo-wrap">
+                <img
+                  className="ambient-modal-photo"
+                  src={selectedAmbient.sceneImage}
+                  alt={`Visualización de inspiración: ${selectedAmbient.title}`}
+                />
+              </div>
+            )}
 
             <div className="ambient-modal-disclaimer">
-              <strong>Visualización de inspiración.</strong> Esta ambientación ayuda a imaginar la combinación completa; algunos detalles, escala y proporciones pueden variar respecto a las piezas reales. Consulta abajo las fotos y fichas de los productos disponibles.
+              {selectedAmbient.sceneComposite ? (
+                <>
+                  <strong>Prueba Photoroom.</strong> Los cuatro productos mostrados salen de las fotos reales del inventario y fueron recortados sin redibujarlos. El fondo es una ambientación de referencia; escala y perspectiva pueden ajustarse.
+                </>
+              ) : (
+                <>
+                  <strong>Visualización de inspiración.</strong> Esta ambientación ayuda a imaginar la combinación completa; algunos detalles, escala y proporciones pueden variar respecto a las piezas reales. Consulta abajo las fotos y fichas de los productos disponibles.
+                </>
+              )}
             </div>
 
             <div className="ambient-modal-products">
@@ -1098,6 +1151,69 @@ const styles = `
     background: #ead9bf;
     box-shadow: 0 18px 42px rgba(45,28,13,.18);
   }
+
+  .ambient-composite-photo {
+    position: relative;
+    margin: 0 24px;
+    aspect-ratio: 4 / 3;
+    border-radius: 20px;
+    overflow: hidden;
+    background: #ead9bf;
+    box-shadow: 0 18px 42px rgba(45,28,13,.18);
+    isolation: isolate;
+  }
+
+  .ambient-composite-bg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: 0;
+  }
+
+  .ambient-composite-layer {
+    position: absolute;
+    display: block;
+    object-fit: contain;
+    pointer-events: none;
+    filter: drop-shadow(0 12px 10px rgba(35,22,12,.18));
+  }
+
+  .ambient-composite-rug {
+    width: 78%;
+    height: 35%;
+    left: 11%;
+    bottom: -1%;
+    z-index: 1;
+    transform: perspective(850px) rotateX(58deg) scaleY(1.35);
+    transform-origin: center bottom;
+    filter: drop-shadow(0 9px 7px rgba(35,22,12,.12));
+  }
+
+  .ambient-composite-mirror {
+    width: 20%;
+    height: 31%;
+    left: 40%;
+    top: 27%;
+    z-index: 3;
+  }
+
+  .ambient-composite-lamp {
+    width: 29%;
+    height: 24%;
+    left: 35.5%;
+    top: 7%;
+    z-index: 4;
+  }
+
+  .ambient-composite-ottoman {
+    width: 29%;
+    height: 38%;
+    left: 35.5%;
+    bottom: 7%;
+    z-index: 5;
+  }
   .ambient-modal-photo {
     width: 100%;
     height: auto;
@@ -1177,7 +1293,12 @@ const styles = `
   .ambient-modal-products strong { color:var(--green-deep); white-space:nowrap; }
   @media (max-width: 640px) {
     .ambient-modal-backdrop { padding: 10px; }
-    .ambient-modal-photo-wrap { margin: 0 12px; border-radius: 14px; }
+    .ambient-modal-photo-wrap,
+    .ambient-composite-photo { margin: 0 12px; border-radius: 14px; }
+    .ambient-composite-mirror { width: 22%; left: 39%; }
+    .ambient-composite-lamp { width: 31%; left: 34.5%; }
+    .ambient-composite-ottoman { width: 31%; left: 34.5%; }
+    .ambient-composite-rug { width: 82%; left: 9%; }
     .ambient-modal-scene { min-height: 360px; margin:0 12px; }
     .ambient-modal-products { grid-template-columns:1fr; padding:12px; }
     .ambient-modal-disclaimer { margin:12px 12px 0; }
