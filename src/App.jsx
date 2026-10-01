@@ -232,6 +232,7 @@ export default function App() {
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [selectedAmbient, setSelectedAmbient] = useState(null);
+  const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
     loadProducts();
@@ -374,56 +375,100 @@ export default function App() {
       <style>{styles}</style>
       <header className="topbar">
         <div className="topbar-inner">
-          <div className="topbar-brand">
+          <a className="topbar-brand" href="#inicio" onClick={() => setMenuOpen(false)}>
             <img src="/logo-donatello.png" alt="Ventas Donatello" />
             <div>
               <strong>Ventas Donatello</strong>
-              <span>Hogar • Muebles • Iluminación • Decoración</span>
+              <span>Muebles • Iluminación • Decoración</span>
+            </div>
+          </a>
+
+          <nav className="desktop-nav" aria-label="Navegación principal">
+            <a href="#inicio">Inicio</a>
+            <a href="#productos">Productos</a>
+            <a href="#ambientes">Ambientes <span>✨</span></a>
+          </nav>
+
+          <div className="topbar-actions">
+            <button
+              type="button"
+              className="menu-toggle"
+              aria-label="Abrir menú"
+              aria-expanded={menuOpen}
+              onClick={() => setMenuOpen((open) => !open)}
+            >
+              <span></span><span></span><span></span>
+            </button>
+
+            <a
+              className="topbar-whatsapp"
+              href={`https://wa.me/${WHATSAPP_NUMBER}`}
+              target="_blank"
+              rel="noreferrer"
+              onClick={() => {
+                track("whatsapp_click", { location: "header" });
+              }}
+            >
+              WhatsApp
+            </a>
+          </div>
+        </div>
+
+        {menuOpen && (
+          <div className="mobile-menu">
+            <a href="#inicio" onClick={() => setMenuOpen(false)}>⌂ <span>Inicio</span></a>
+            <a href="#productos" onClick={() => setMenuOpen(false)}>▦ <span>Productos</span></a>
+            <a href="#ambientes" onClick={() => setMenuOpen(false)}>✦ <span>Ambientes</span></a>
+            <div className="mobile-menu-coming">
+              <small>ESPACIO PARA CRECER</small>
+              <span>Próximamente podremos sumar nuevas secciones aquí.</span>
             </div>
           </div>
-
-
-          <a
-  className="topbar-whatsapp"
-  href={`https://wa.me/${WHATSAPP_NUMBER}`}
-  target="_blank"
-  rel="noreferrer"
-  onClick={() => {
-    track("whatsapp_click", {
-      location: "header",
-    });
-  }}
->
-  WhatsApp
-</a>
-        </div>
+        )}
       </header>
 
-      <section className="premium-banner">
-        <img
-          className="desktop-banner"
-          src="/banner-donatello-premium.png"
-          alt="Ventas Donatello Premium - catálogo de muebles, decoración, iluminación, bazar y juguetes"
-        />
-        <img
-          className="mobile-banner"
-          src="/banner-mobile.png"
-          alt="Ventas Donatello Premium móvil"
-        />
-      </section>
-
-      <main className="shell">
-        <section className="intro-card">
-          <div>
-            <h2>Colección disponible</h2>
-            <p>
-              Descubre piezas disponibles para transformar tu espacio. Consulta por WhatsApp y recibe atención personalizada.
-            </p>
+      <main className="shell" id="inicio">
+        <section className="catalog-hero">
+          <div className="catalog-hero-bg">
+            <img
+              src="https://lotgmhfqzthhhadavwlu.supabase.co/storage/v1/object/public/product-images/ambientes/rincon-lectura-final-v2.png"
+              alt=""
+            />
           </div>
+          <div className="catalog-hero-overlay"></div>
+          <div className="catalog-hero-content">
+            <span className="hero-eyebrow">CATÁLOGO DONATELLO</span>
+            <h1>Encuentra una pieza.<br />Imagina todo el espacio.</h1>
+            <p>
+              Explora lo disponible o entra a Ambientes para ver cómo pueden combinarse nuestros productos en espacios reales.
+            </p>
+            <div className="hero-actions">
+              <a className="hero-btn primary" href="#productos">Ver productos</a>
+              <a className="hero-btn secondary" href="#ambientes">Explorar ambientes ✨</a>
+            </div>
+          </div>
+          <div className="hero-caption">
+            <span>Inspiración Donatello</span>
+            <strong>Rincón de lectura</strong>
+          </div>
+        </section>
 
-          <button className="refresh-btn" onClick={loadProducts}>
-            Actualizar catálogo
-          </button>
+        <section className="catalog-shortcuts" aria-label="Accesos rápidos">
+          <a href="#productos">
+            <span className="shortcut-icon">▦</span>
+            <div><strong>Productos</strong><small>Todo lo disponible</small></div>
+            <span className="shortcut-arrow">→</span>
+          </a>
+          <a href="#ambientes">
+            <span className="shortcut-icon">✦</span>
+            <div><strong>Ambientes</strong><small>Ideas para combinar</small></div>
+            <span className="shortcut-arrow">→</span>
+          </a>
+          <a href={`https://wa.me/${WHATSAPP_NUMBER}`} target="_blank" rel="noreferrer">
+            <span className="shortcut-icon">◉</span>
+            <div><strong>WhatsApp</strong><small>Pregunta o aparta</small></div>
+            <span className="shortcut-arrow">→</span>
+          </a>
         </section>
 
         {!loading && !loadError && ambientScenes.length > 0 && (
@@ -576,7 +621,7 @@ export default function App() {
             </div>
           </section>
         )}
-        <section className="filters-card">
+        <section className="filters-card" id="productos">
           <div className="search-box">
             <span>🔎</span>
             <input
@@ -2351,6 +2396,308 @@ const styles = `
 
   .ambient-complement-chip strong {
     white-space: nowrap;
+  }
+
+  /* --- Prueba navegación + portada v2 --- */
+  .topbar-brand { text-decoration: none; }
+  .topbar-inner { min-height: 78px; }
+  .desktop-nav {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-left: auto;
+  }
+  .desktop-nav a {
+    color: rgba(255,247,230,.82);
+    text-decoration: none;
+    font-size: .9rem;
+    font-weight: 800;
+    padding: 10px 12px;
+    border-radius: 999px;
+    transition: background .18s ease, color .18s ease;
+  }
+  .desktop-nav a:hover {
+    color: white;
+    background: rgba(255,255,255,.08);
+  }
+  .desktop-nav a span { color: var(--gold-soft); }
+
+  .topbar-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-left: 10px;
+  }
+
+  .menu-toggle {
+    display: none;
+    width: 42px;
+    height: 42px;
+    padding: 10px;
+    border-radius: 12px;
+    border: 1px solid rgba(230,195,122,.34);
+    background: rgba(255,255,255,.05);
+    cursor: pointer;
+  }
+  .menu-toggle span {
+    display: block;
+    height: 2px;
+    margin: 4px 0;
+    border-radius: 9px;
+    background: #fff7e6;
+  }
+
+  .mobile-menu { display: none; }
+
+  .catalog-hero {
+    position: relative;
+    min-height: 480px;
+    overflow: hidden;
+    border-radius: 28px;
+    border: 1px solid rgba(230,195,122,.4);
+    box-shadow: var(--shadow-premium);
+    isolation: isolate;
+  }
+  .catalog-hero-bg,
+  .catalog-hero-overlay {
+    position: absolute;
+    inset: 0;
+  }
+  .catalog-hero-bg img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  .catalog-hero-overlay {
+    z-index: 1;
+    background:
+      linear-gradient(90deg, rgba(5,15,11,.90) 0%, rgba(5,15,11,.72) 43%, rgba(5,15,11,.16) 78%),
+      linear-gradient(0deg, rgba(5,15,11,.28), transparent 50%);
+  }
+  .catalog-hero-content {
+    position: relative;
+    z-index: 2;
+    width: min(620px, 70%);
+    padding: 70px 54px;
+    color: white;
+  }
+  .hero-eyebrow {
+    display: inline-block;
+    margin-bottom: 14px;
+    color: var(--gold-soft);
+    font-size: .76rem;
+    font-weight: 900;
+    letter-spacing: .16em;
+  }
+  .catalog-hero h1 {
+    margin: 0;
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: clamp(2.4rem, 5vw, 4.6rem);
+    line-height: .98;
+    font-weight: 500;
+    letter-spacing: -.035em;
+  }
+  .catalog-hero-content p {
+    max-width: 560px;
+    margin: 20px 0 0;
+    color: rgba(255,247,230,.82);
+    font-size: 1.02rem;
+    line-height: 1.65;
+  }
+  .hero-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 28px;
+  }
+  .hero-btn {
+    text-decoration: none;
+    border-radius: 14px;
+    padding: 13px 18px;
+    font-weight: 900;
+  }
+  .hero-btn.primary {
+    color: var(--green-black);
+    background: linear-gradient(180deg,#f3e3bc,#d9b76b);
+    border: 1px solid #f7e8bd;
+  }
+  .hero-btn.secondary {
+    color: white;
+    background: rgba(255,255,255,.09);
+    border: 1px solid rgba(255,255,255,.26);
+    backdrop-filter: blur(8px);
+  }
+  .hero-caption {
+    position: absolute;
+    z-index: 2;
+    right: 22px;
+    bottom: 20px;
+    padding: 10px 13px;
+    border-radius: 13px;
+    color: white;
+    background: rgba(7,20,15,.72);
+    border: 1px solid rgba(230,195,122,.28);
+    backdrop-filter: blur(10px);
+  }
+  .hero-caption span,
+  .hero-caption strong { display: block; }
+  .hero-caption span { color: var(--gold-soft); font-size: .68rem; text-transform: uppercase; letter-spacing: .08em; }
+  .hero-caption strong { margin-top: 2px; font-family: Georgia,"Times New Roman",serif; font-size: .95rem; }
+
+  .catalog-shortcuts {
+    display: grid;
+    grid-template-columns: repeat(3,minmax(0,1fr));
+    gap: 12px;
+    margin: 16px 0 4px;
+  }
+  .catalog-shortcuts > a {
+    display: grid;
+    grid-template-columns: 42px minmax(0,1fr) auto;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 16px;
+    text-decoration: none;
+    color: var(--green-black);
+    background: rgba(255,250,240,.94);
+    border: 1px solid var(--border);
+    border-radius: 17px;
+    box-shadow: 0 10px 26px rgba(16,41,31,.08);
+    transition: transform .18s ease, box-shadow .18s ease;
+  }
+  .catalog-shortcuts > a:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 16px 34px rgba(16,41,31,.13);
+  }
+  .shortcut-icon {
+    width: 42px;
+    height: 42px;
+    display: grid;
+    place-items: center;
+    border-radius: 13px;
+    color: #fff7e6;
+    background: var(--green-deep);
+    font-size: 1.12rem;
+  }
+  .catalog-shortcuts strong,
+  .catalog-shortcuts small { display: block; }
+  .catalog-shortcuts strong { color: var(--green-deep); }
+  .catalog-shortcuts small { margin-top: 2px; color: var(--muted); font-size: .74rem; }
+  .shortcut-arrow { color: var(--gold); font-size: 1.2rem; }
+
+  .filters-card { scroll-margin-top: 96px; }
+  .ambient-section { scroll-margin-top: 96px; }
+
+  @media (max-width: 760px) {
+    .topbar-inner {
+      min-height: 66px;
+      align-items: center;
+    }
+    .desktop-nav { display: none; }
+    .menu-toggle { display: block; }
+    .topbar-actions { margin-left: auto; }
+    .topbar-brand strong { font-size: .93rem; }
+    .topbar-whatsapp {
+      padding: 9px 11px;
+      font-size: .78rem;
+    }
+
+    .mobile-menu {
+      display: grid;
+      gap: 6px;
+      position: absolute;
+      top: calc(100% + 8px);
+      left: 12px;
+      right: 12px;
+      padding: 10px;
+      border-radius: 18px;
+      background: rgba(255,250,240,.98);
+      border: 1px solid rgba(185,135,49,.36);
+      box-shadow: 0 24px 60px rgba(0,0,0,.26);
+    }
+    .mobile-menu > a {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      padding: 13px 14px;
+      text-decoration: none;
+      color: var(--green-deep);
+      border-radius: 12px;
+      font-weight: 900;
+    }
+    .mobile-menu > a:hover { background: rgba(230,195,122,.18); }
+    .mobile-menu-coming {
+      margin-top: 4px;
+      padding: 12px 14px;
+      border-top: 1px solid rgba(185,135,49,.22);
+    }
+    .mobile-menu-coming small {
+      display: block;
+      color: var(--gold);
+      font-size: .64rem;
+      font-weight: 900;
+      letter-spacing: .1em;
+    }
+    .mobile-menu-coming span {
+      display: block;
+      margin-top: 4px;
+      color: var(--muted);
+      font-size: .78rem;
+      line-height: 1.35;
+    }
+
+    .catalog-hero {
+      min-height: 520px;
+      border-radius: 20px;
+    }
+    .catalog-hero-bg img {
+      object-position: 58% center;
+    }
+    .catalog-hero-overlay {
+      background:
+        linear-gradient(0deg, rgba(5,15,11,.94) 0%, rgba(5,15,11,.72) 47%, rgba(5,15,11,.18) 82%);
+    }
+    .catalog-hero-content {
+      width: 100%;
+      padding: 238px 20px 78px;
+    }
+    .catalog-hero h1 {
+      font-size: clamp(2.2rem,12vw,3.35rem);
+      line-height: 1;
+    }
+    .catalog-hero-content p {
+      font-size: .9rem;
+      line-height: 1.5;
+    }
+    .hero-actions {
+      display: grid;
+      grid-template-columns: 1fr;
+    }
+    .hero-btn { text-align: center; }
+    .hero-caption {
+      left: 16px;
+      right: auto;
+      top: 16px;
+      bottom: auto;
+    }
+
+    .catalog-shortcuts {
+      display: flex;
+      overflow-x: auto;
+      gap: 9px;
+      padding-bottom: 4px;
+      scrollbar-width: none;
+    }
+    .catalog-shortcuts::-webkit-scrollbar { display:none; }
+    .catalog-shortcuts > a {
+      flex: 0 0 78%;
+      padding: 12px;
+    }
+  }
+
+  @media (max-width: 420px) {
+    .topbar-brand div span { display:none; }
+    .catalog-hero-content { padding-left: 18px; padding-right: 18px; }
   }
 
 `;
