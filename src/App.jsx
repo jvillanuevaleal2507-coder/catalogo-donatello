@@ -112,7 +112,7 @@ const AMBIENT_BLUEPRINTS = [
     subtitle: "Cómodo, verde y relajado",
     description: "Un espacio para leer, descansar o ver una serie con piezas que se sienten más de casa que de catálogo.",
     visualScene: true,
-    sceneImage: "https://lotgmhfqzthhhadavwlu.supabase.co/storage/v1/object/public/product-images/ambientes/rincon-lectura-final-v2.png",
+    sceneImage: "https://lotgmhfqzthhhadavwlu.supabase.co/storage/v1/object/public/product-images/ambientes/comedor-calido-stock-v2.png",
     productCodes: ["DON-000153", "DON-000148", "DON-000042", "DON-000135"],
     visualQuantities: {
       "DON-000153": 1,
@@ -449,7 +449,7 @@ export default function App() {
           </div>
           <div className="hero-caption">
             <span>Inspiración Donatello</span>
-            <strong>Rincón de lectura</strong>
+            <strong>Comedor cálido</strong>
           </div>
         </section>
 
@@ -2651,7 +2651,7 @@ const styles = `
       border-radius: 20px;
     }
     .catalog-hero-bg img {
-      object-position: 58% center;
+      object-position: 54% center;
     }
     .catalog-hero-overlay {
       background:
