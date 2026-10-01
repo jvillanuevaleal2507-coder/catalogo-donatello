@@ -237,6 +237,11 @@ export default function App() {
 
   useEffect(() => {
     loadProducts();
+    window.history.replaceState(
+      { ...(window.history.state || {}), donatelloSection: "inicio" },
+      "",
+      window.location.href
+    );
   }, []);
 
   useEffect(() => {
@@ -245,6 +250,13 @@ export default function App() {
         setSelectedProduct(null);
         setSelectedImageIndex(0);
       }
+
+      const section = event.state?.donatelloSection || "inicio";
+      setActiveSection(section);
+      setMenuOpen(false);
+      window.requestAnimationFrame(() => {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      });
     }
 
     window.addEventListener("popstate", handlePopState);
@@ -303,7 +315,11 @@ export default function App() {
 
   function openProduct(product, imageIndex = 0) {
     window.history.pushState(
-      { donatelloProductModal: true },
+      {
+        ...(window.history.state || {}),
+        donatelloProductModal: true,
+        donatelloSection: activeSection,
+      },
       "",
       window.location.href
     );
@@ -372,6 +388,18 @@ export default function App() {
     selectedImages[selectedImageIndex] || selectedProduct?.image_url || "";
 
   function navigateSection(section) {
+    if (section !== activeSection) {
+      window.history.pushState(
+        {
+          ...(window.history.state || {}),
+          donatelloProductModal: false,
+          donatelloSection: section,
+        },
+        "",
+        window.location.href
+      );
+    }
+
     setActiveSection(section);
     setMenuOpen(false);
     track("catalog_section_open", { section });
@@ -483,6 +511,19 @@ export default function App() {
           </a>
         </section>
           </>
+        )}
+
+        {activeSection !== "inicio" && (
+          <div className="section-nav-row">
+            <button
+              type="button"
+              className="section-home-btn"
+              onClick={() => navigateSection("inicio")}
+            >
+              ← Inicio
+            </button>
+            <span>{activeSection === "productos" ? "Productos" : "Ambientes"}</span>
+          </div>
         )}
 
         {activeSection === "ambientes" && !loading && !loadError && ambientScenes.length > 0 && (
@@ -2609,6 +2650,38 @@ const styles = `
   .catalog-shortcuts strong { color: var(--green-deep); }
   .catalog-shortcuts small { margin-top: 2px; color: var(--muted); font-size: .74rem; }
   .shortcut-arrow { color: var(--gold); font-size: 1.2rem; }
+
+  .section-nav-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin: 4px 0 14px;
+  }
+
+  .section-nav-row > span {
+    color: var(--muted);
+    font-size: .78rem;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+  }
+
+  .section-home-btn {
+    border: 1px solid rgba(185,135,49,.36);
+    background: rgba(255,250,240,.92);
+    color: var(--green-deep);
+    border-radius: 999px;
+    padding: 8px 12px;
+    font-size: .82rem;
+    font-weight: 900;
+    cursor: pointer;
+    box-shadow: 0 7px 18px rgba(16,41,31,.08);
+  }
+
+  .section-home-btn:active {
+    transform: translateY(1px);
+  }
 
   .filters-card { scroll-margin-top: 96px; }
   .ambient-section { scroll-margin-top: 96px; }
