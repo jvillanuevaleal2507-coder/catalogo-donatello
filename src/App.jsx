@@ -676,7 +676,8 @@ export default function App() {
             </div>
           </section>
         )}
-        {activeSection === "productos" && (<>\n        <section className="filters-card" id="productos">
+        {activeSection === "productos" && (<>
+        <section className="filters-card" id="productos">
           <div className="search-box">
             <span>🔎</span>
             <input
