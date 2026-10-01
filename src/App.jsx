@@ -112,7 +112,7 @@ const AMBIENT_BLUEPRINTS = [
     subtitle: "Cómodo, verde y relajado",
     description: "Un espacio para leer, descansar o ver una serie con piezas que se sienten más de casa que de catálogo.",
     visualScene: true,
-    sceneImage: "https://lotgmhfqzthhhadavwlu.supabase.co/storage/v1/object/public/product-images/ambientes/comedor-calido-stock-v2.png",
+    sceneImage: "https://lotgmhfqzthhhadavwlu.supabase.co/storage/v1/object/public/product-images/ambientes/rincon-lectura-final-v2.png",
     productCodes: ["DON-000153", "DON-000148", "DON-000042", "DON-000135"],
     visualQuantities: {
       "DON-000153": 1,
@@ -431,7 +431,7 @@ export default function App() {
         <section className="catalog-hero">
           <div className="catalog-hero-bg">
             <img
-              src="https://lotgmhfqzthhhadavwlu.supabase.co/storage/v1/object/public/product-images/ambientes/rincon-lectura-final-v2.png"
+              src="https://lotgmhfqzthhhadavwlu.supabase.co/storage/v1/object/public/product-images/ambientes/comedor-calido-stock-v2.png"
               alt=""
             />
           </div>
