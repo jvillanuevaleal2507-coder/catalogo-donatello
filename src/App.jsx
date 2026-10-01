@@ -138,8 +138,6 @@ const AMBIENT_BLUEPRINTS = [
     },
     complementCodes: ["DON-000049", "DON-000067"],
   },
-    complementCodes: ["DON-000050", "DON-000014"],
-  },
   {
     key: "recamara-boho",
     title: "Recámara boho",
