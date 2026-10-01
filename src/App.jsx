@@ -233,6 +233,7 @@ export default function App() {
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [selectedAmbient, setSelectedAmbient] = useState(null);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [activeSection, setActiveSection] = useState("inicio");
 
   useEffect(() => {
     loadProducts();
@@ -370,12 +371,21 @@ export default function App() {
   const selectedImage =
     selectedImages[selectedImageIndex] || selectedProduct?.image_url || "";
 
+  function navigateSection(section) {
+    setActiveSection(section);
+    setMenuOpen(false);
+    track("catalog_section_open", { section });
+    window.requestAnimationFrame(() => {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    });
+  }
+
   return (
     <div className="app">
       <style>{styles}</style>
       <header className="topbar">
         <div className="topbar-inner">
-          <a className="topbar-brand" href="#inicio" onClick={() => setMenuOpen(false)}>
+          <a className="topbar-brand" href="#inicio" onClick={(event) => { event.preventDefault(); navigateSection("inicio"); }}>
             <img src="/logo-donatello.png" alt="Ventas Donatello" />
             <div>
               <strong>Ventas Donatello</strong>
@@ -384,9 +394,9 @@ export default function App() {
           </a>
 
           <nav className="desktop-nav" aria-label="Navegación principal">
-            <a href="#inicio">Inicio</a>
-            <a href="#productos">Productos</a>
-            <a href="#ambientes">Ambientes <span>✨</span></a>
+            <a className={activeSection === "inicio" ? "active" : ""} href="#inicio" onClick={(event) => { event.preventDefault(); navigateSection("inicio"); }}>Inicio</a>
+            <a className={activeSection === "productos" ? "active" : ""} href="#productos" onClick={(event) => { event.preventDefault(); navigateSection("productos"); }}>Productos</a>
+            <a className={activeSection === "ambientes" ? "active" : ""} href="#ambientes" onClick={(event) => { event.preventDefault(); navigateSection("ambientes"); }}>Ambientes <span>✨</span></a>
           </nav>
 
           <div className="topbar-actions">
@@ -416,9 +426,9 @@ export default function App() {
 
         {menuOpen && (
           <div className="mobile-menu">
-            <a href="#inicio" onClick={() => setMenuOpen(false)}>⌂ <span>Inicio</span></a>
-            <a href="#productos" onClick={() => setMenuOpen(false)}>▦ <span>Productos</span></a>
-            <a href="#ambientes" onClick={() => setMenuOpen(false)}>✦ <span>Ambientes</span></a>
+            <a href="#inicio" onClick={(event) => { event.preventDefault(); navigateSection("inicio"); }}>⌂ <span>Inicio</span></a>
+            <a href="#productos" onClick={(event) => { event.preventDefault(); navigateSection("productos"); }}>▦ <span>Productos</span></a>
+            <a href="#ambientes" onClick={(event) => { event.preventDefault(); navigateSection("ambientes"); }}>✦ <span>Ambientes</span></a>
             <div className="mobile-menu-coming">
               <small>ESPACIO PARA CRECER</small>
               <span>Próximamente podremos sumar nuevas secciones aquí.</span>
@@ -428,6 +438,8 @@ export default function App() {
       </header>
 
       <main className="shell" id="inicio">
+        {activeSection === "inicio" && (
+          <>
         <section className="catalog-hero">
           <div className="catalog-hero-bg">
             <img
@@ -443,8 +455,8 @@ export default function App() {
               Explora lo disponible o entra a Ambientes para ver cómo pueden combinarse nuestros productos en espacios reales.
             </p>
             <div className="hero-actions">
-              <a className="hero-btn primary" href="#productos">Ver productos</a>
-              <a className="hero-btn secondary" href="#ambientes">Explorar ambientes ✨</a>
+              <a className="hero-btn primary" href="#productos" onClick={(event) => { event.preventDefault(); navigateSection("productos"); }}>Ver productos</a>
+              <a className="hero-btn secondary" href="#ambientes" onClick={(event) => { event.preventDefault(); navigateSection("ambientes"); }}>Explorar ambientes ✨</a>
             </div>
           </div>
           <div className="hero-caption">
@@ -454,12 +466,12 @@ export default function App() {
         </section>
 
         <section className="catalog-shortcuts" aria-label="Accesos rápidos">
-          <a href="#productos">
+          <a href="#productos" onClick={(event) => { event.preventDefault(); navigateSection("productos"); }}>
             <span className="shortcut-icon">▦</span>
             <div><strong>Productos</strong><small>Todo lo disponible</small></div>
             <span className="shortcut-arrow">→</span>
           </a>
-          <a href="#ambientes">
+          <a href="#ambientes" onClick={(event) => { event.preventDefault(); navigateSection("ambientes"); }}>
             <span className="shortcut-icon">✦</span>
             <div><strong>Ambientes</strong><small>Ideas para combinar</small></div>
             <span className="shortcut-arrow">→</span>
@@ -470,8 +482,10 @@ export default function App() {
             <span className="shortcut-arrow">→</span>
           </a>
         </section>
+          </>
+        )}
 
-        {!loading && !loadError && ambientScenes.length > 0 && (
+        {activeSection === "ambientes" && !loading && !loadError && ambientScenes.length > 0 && (
           <section className="ambient-section" id="ambientes">
             <div className="ambient-heading">
               <div>
@@ -621,7 +635,7 @@ export default function App() {
             </div>
           </section>
         )}
-        <section className="filters-card" id="productos">
+        {activeSection === "productos" && (<>\n        <section className="filters-card" id="productos">
           <div className="search-box">
             <span>🔎</span>
             <input
@@ -735,6 +749,7 @@ export default function App() {
             </section>
           </>
         )}
+        </>)}
       </main>
 
       {selectedAmbient && (
@@ -2421,6 +2436,16 @@ const styles = `
     background: rgba(255,255,255,.08);
   }
   .desktop-nav a span { color: var(--gold-soft); }
+
+
+  .desktop-nav a.active {
+    color: var(--green-black);
+    background: linear-gradient(180deg, #efe1bd, #d4ae5c);
+  }
+
+  .section-intro {
+    margin-bottom: 18px;
+  }
 
   .topbar-actions {
     display: flex;
