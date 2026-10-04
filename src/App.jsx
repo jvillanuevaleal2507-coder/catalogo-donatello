@@ -170,6 +170,49 @@ const AMBIENT_BLUEPRINTS = [
     },
     complementCodes: ["DON-000052", "DON-000033"],
   },
+  {
+    key: "comedor-cava",
+    title: "Comedor con cava",
+    subtitle: "Madera rústica, vino y luz cálida",
+    description: "Comedor con estación para vinos y lámpara colgante de madera para visualizar el conjunto en un ambiente completo.",
+    visualScene: true,
+    sceneImage: "/ambientes/comedor-cava-aprobado.webp",
+    productCodes: ["DON-000118", "DON-000001"],
+    visualQuantities: {
+      "DON-000118": 1,
+      "DON-000001": 1,
+    },
+    complementCodes: [],
+  },
+  {
+    key: "terraza-ratan",
+    title: "Terraza de ratán",
+    subtitle: "Dos piezas que hacen juego",
+    description: "Juego de bar para patio y bar exterior de ratán coordinados en una terraza funcional.",
+    visualScene: true,
+    sceneImage: "/ambientes/terraza-ratan-aprobada.webp",
+    productCodes: ["DON-000078", "DON-000093"],
+    visualQuantities: {
+      "DON-000078": 1,
+      "DON-000093": 1,
+    },
+    complementCodes: [],
+  },
+  {
+    key: "recamara-individual",
+    title: "Recámara individual",
+    subtitle: "Simple, cálida y funcional",
+    description: "Base individual, colchón Memory Foam y un solo buró para visualizar una recámara limpia y práctica.",
+    visualScene: true,
+    sceneImage: "/ambientes/recamara-individual-aprobada.webp",
+    productCodes: ["DON-000020", "DON-000013", "DON-000100"],
+    visualQuantities: {
+      "DON-000020": 1,
+      "DON-000013": 1,
+      "DON-000100": 1,
+    },
+    complementCodes: [],
+  },
 ];
 
 function pickProductsByCodes(products, codes) {
