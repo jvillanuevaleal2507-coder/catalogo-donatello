@@ -1,6 +1,24 @@
 const STORAGE_KEY = "donatello_favorites_v1";
 const WHATSAPP_NUMBER = "528999122313";
 
+function escapeHtml(value) {
+  return String(value ?? "").replace(/[&<>"\x27]/g, (character) => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "\x27": "&#39;",
+  })[character]);
+}
+
+function safeImageUrl(value) {
+  try {
+    const url = new URL(String(value || ""));
+    return (url.protocol === "https:" || url.protocol === "http:") ? url.href : "";
+  } catch {
+    return "";
+  }
+}
 function readFavorites() {
   try {
     const parsed = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
@@ -165,8 +183,8 @@ function renderDrawer() {
       <div class="donatello-favorites-list">
         ${favorites.length ? favorites.map((item, index) => `
           <article class="donatello-favorite-item">
-            ${item.image ? `<img src="${item.image}" alt="">` : `<div class="donatello-fav-placeholder">VD</div>`}
-            <div><strong>${item.name}</strong>${item.code ? `<small>Ref: ${item.code}</small>` : ""}<span>${item.price || ""}</span></div>
+            ${safeImageUrl(item.image) ? `<img src="${escapeHtml(safeImageUrl(item.image))}" alt="">` : `<div class="donatello-fav-placeholder">VD</div>`}
+            <div><strong>${escapeHtml(item.name)}</strong>${item.code ? `<small>Ref: ${escapeHtml(item.code)}</small>` : ""}<span>${escapeHtml(item.price)}</span></div>
             <button type="button" data-remove-favorite="${index}" aria-label="Quitar">×</button>
           </article>
         `).join("") : `<div class="donatello-favorites-empty"><span>♡</span><strong>Aún no tienes favoritos</strong><p>Toca el corazón de los productos que te gusten y aparecerán aquí.</p></div>`}
