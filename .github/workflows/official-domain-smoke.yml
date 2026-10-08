@@ -1,0 +1,24 @@
+name: Catalog official domain one-time smoke
+on:
+  push:
+    branches:
+      - security-hardening-oct-2026
+    paths:
+      - '.github/workflows/official-domain-smoke.yml'
+      - 'tests/official-domain-smoke.cjs'
+permissions:
+  contents: read
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+      - name: Install browser driver without project credentials
+        run: npm install --no-save --package-lock=false --ignore-scripts --no-audit playwright-core@1.56.1
+      - name: Verify Chrome installed
+        run: command -v google-chrome
+      - name: Smoke test live Donatello catalog without mutations
+        run: timeout --kill-after=5s 110s node tests/official-domain-smoke.cjs
