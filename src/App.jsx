@@ -277,27 +277,6 @@ export default function App() {
   const [selectedAmbient, setSelectedAmbient] = useState(null);
   const [menuOpen, setMenuOpen] = useState(false);
   const [activeSection, setActiveSection] = useState("inicio");
-  const [localReelEngine, setLocalReelEngine] = useState(false);
-
-  // Este botón solo está disponible en la computadora donde corre el render local.
-  // El catálogo público jamás envía trabajos a un servidor de video.
-  useEffect(() => {
-    let mounted = true;
-    async function checkLocalReels() {
-      try {
-        const response = await fetch("http://127.0.0.1:4477/health", { cache: "no-store" });
-        if (mounted) setLocalReelEngine(response.ok);
-      } catch {
-        if (mounted) setLocalReelEngine(false);
-      }
-    }
-    checkLocalReels();
-    window.addEventListener("focus", checkLocalReels);
-    return () => {
-      mounted = false;
-      window.removeEventListener("focus", checkLocalReels);
-    };
-  }, []);
 
   useEffect(() => {
     loadProducts();
@@ -389,19 +368,6 @@ export default function App() {
     );
     setSelectedProduct(product);
     setSelectedImageIndex(imageIndex);
-  }
-
-  function openReelStudio(product) {
-    // Solamente datos comerciales públicos: nunca costos, compras ni credenciales.
-    window.sessionStorage.setItem("donatello_reel_product", JSON.stringify({
-      code: product.code,
-      name: product.name,
-      category: product.category,
-      price: product.price,
-      stock: product.stock,
-      images: getProductImages(product),
-    }));
-    window.location.assign("/estudio-reels.html");
   }
 
   function closeProduct() {
@@ -1034,16 +1000,6 @@ export default function App() {
                 <strong>{money(selectedProduct.price)}</strong>
               </div>
 
-              {localReelEngine && Number(selectedProduct.stock || 0) > 0 && (
-                <button
-                  type="button"
-                  className="modal-reel-local"
-                  onClick={() => openReelStudio(selectedProduct)}
-                >
-                  ✦ Crear Reel en esta computadora
-                </button>
-              )}
-
               <a
                 className="modal-whatsapp"
                 href={buildWhatsAppLink(selectedProduct)}
@@ -1078,21 +1034,6 @@ export default function App() {
 }
 
 const styles = `
-  .modal-reel-local {
-    display: block;
-    width: 100%;
-    margin: 0 0 12px;
-    padding: 13px 16px;
-    border: 1px solid #b88e56;
-    border-radius: 12px;
-    color: #203e2d;
-    background: #f3e5cd;
-    font-weight: 800;
-    font-size: 14px;
-    cursor: pointer;
-  }
-  .modal-reel-local:hover { background: #e9d2ac; }
-
   :root {
     --green-black: #07140f;
     --green-deep: #0f2c21;
