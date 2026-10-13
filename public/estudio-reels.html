@@ -29,6 +29,7 @@ button,.download{display:inline-flex;align-items:center;justify-content:center;g
 #status{margin-top:14px;background:#f1eee5;border-radius:9px;padding:12px;font-size:13px;color:#5e6b5f}
 #status.bad{background:#f9eae7;color:#983f30}#status.good{background:#e9f1e5;color:#2d613c}
 #result{display:none}.video{width:100%;max-height:650px;background:#15130f;border-radius:14px}
+.copyPreview{margin-top:15px;border-top:1px solid #bca98f6b;padding-top:13px;text-align:left;font-size:13px;line-height:1.6}.copyPreview strong{color:#f9e6c5}.copyPreview span{display:block}
 .small{font-size:13px;color:var(--muted)}.previewTitle{font:32px "DM Serif Display",Georgia,serif}
 .previewCard{background:linear-gradient(180deg,#242920,#483829);color:#f5eee1;padding:28px;border-radius:14px;text-align:center}
 .previewImages{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin:15px 0}.previewImages img{width:100%;height:200px;object-fit:cover;border-radius:8px}
@@ -64,7 +65,7 @@ button,.download{display:inline-flex;align-items:center;justify-content:center;g
 </section>
 <section class="card">
 <h2>Vista del proyecto</h2>
-<div class="previewCard"><div class="eyebrow" style="color:#dfbf8f">Donatello presenta</div><div class="previewTitle" id="previewTitle">Tu próximo Reel</div><div class="previewImages"><img id="prev1" alt="Primer ambiente"><img id="prev2" alt="Segundo ambiente"></div><div style="font-size:25px;font-weight:800" id="previewPrice"></div><div class="small" style="color:#e3d4c1">Cierre sobre el segundo ambiente · 11.8 segundos · 9:16</div></div>
+<div class="previewCard"><div class="eyebrow" style="color:#dfbf8f">Donatello presenta</div><div class="previewTitle" id="previewTitle">Tu próximo Reel</div><div class="previewImages"><img id="prev1" alt="Primer ambiente"><img id="prev2" alt="Segundo ambiente"></div><div style="font-size:25px;font-weight:800" id="previewPrice"></div><div class="small" style="color:#e3d4c1">Cierre sobre el segundo ambiente · 11.8 segundos · 9:16</div><div class="copyPreview"><strong>Textos que aparecerán en el Reel</strong><span id="previewCopy1"></span><span id="previewCopy2"></span><span id="previewDetails"></span><span id="previewCta"></span></div></div>
 <p class="small">Esta vista organiza las fotografías y los datos. El movimiento y las transiciones exactas se comprueban en el MP4 final.</p>
 <div id="result"><h2 style="margin-top:25px">Tu Reel terminado</h2><video id="video" class="video" controls playsinline></video><a id="download" class="download">⬇ Descargar MP4</a></div>
 </section>
@@ -77,6 +78,92 @@ const $=id=>document.getElementById(id);
 let product=null, gallery=[];
 function say(message,kind=""){$("status").textContent=message;$("status").className=kind}
 function setImage(index,src){$("thumb"+index).src=src||"";$("prev"+index).src=src||""}
+function normalizeText(value){
+ return String(value||"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase();
+}
+// Textos orientativos según el producto: nunca añade características no confirmadas.
+// Permanecen editables antes de generar cada video.
+function suggestCopy(item){
+ const name=normalizeText(item.name), category=normalizeText(item.category);
+ const text=name+" "+category;
+ const is=(pattern)=>pattern.test(text);
+ const base={
+   title1:"Un detalle que enamora.",
+   title2:"Dale personalidad a tu hogar.",
+   details:"Descubre esta pieza de Donatello.",
+   sub1:"Hay detalles que cambian la manera de vivir un espacio.",
+   sub2:"Inspírate con esta pieza en tu hogar.",
+   tag1:"Selección Donatello",
+   tag2:"Pregunta sin compromiso",
+   cta:"¿Te gustaría tenerlo en casa?"
+ };
+ if(is(/\b(sillas?|butacas?)\b/)){
+   const plural=/\b(sillas|butacas)\b/.test(text);
+   return {...base,
+     title1:"Tu comedor con otro estilo.",
+     title2:"Espacios para compartir.",
+     details: /\bset de 2\b/.test(name)?"Set de 2 sillas para comedor":(plural?"Sillas para darle estilo a tu espacio.":"Un asiento que luce en cualquier rincón."),
+     sub1:"Dale un nuevo aire a tu comedor.",
+     sub2:"El detalle que completa el ambiente.",
+     tag1:"Diseño para tu comedor",
+     cta:plural?"¿Te imaginas estas sillas en casa?":"¿Dónde colocarías esta silla?"
+   };
+ }
+ if(is(/\b(lamparas?|candiles?|iluminacion|luminarias?)\b/)){
+   const bulbCount=name.match(/\b(\d+)\s*focos?\b/);
+   return {...base,
+     title1:"Luz que transforma.",
+     title2:"Calidez para tus espacios.",
+     details:(bulbCount?bulbCount[1]+" focos · ":"")+"Iluminación decorativa.",
+     sub1:"Una luz especial puede cambiar todo el ambiente.",
+     sub2:"Haz de tu espacio un lugar más acogedor.",
+     tag1:"Iluminación decorativa",
+     cta:"¿Dónde colocarías esta lámpara?"
+   };
+ }
+ if(is(/\b(espejos?)\b/)){
+   return {...base,title1:"Un reflejo de tu estilo.",title2:"Detalles que amplían el espacio.",
+     details:"Espejo decorativo para tu hogar.",
+     sub1:"Dale profundidad y personalidad a cualquier rincón.",
+     sub2:"Un toque que se nota desde el primer vistazo.",
+     tag1:"Decoración",cta:"¿En qué espacio pondrías este espejo?"};
+ }
+ if(is(/\b(mesas?|comedores?)\b/)){
+   return {...base,title1:"Un espacio para reunirnos.",title2:"Momentos alrededor de la mesa.",
+     details:"Una pieza para compartir en casa.",
+     sub1:"Los mejores momentos necesitan un buen lugar.",
+     sub2:"Inspírate para transformar tu comedor.",
+     tag1:"Muebles para tu hogar",cta:"¿Te gustaría verla en tu comedor?"};
+ }
+ if(is(/\b(sofas?|sillones?|reclinables?)\b/)){
+   return {...base,title1:"Tu rincón favorito.",title2:"Comodidad con estilo.",
+     details:"Una pieza para disfrutar tu espacio.",
+     sub1:"Un ambiente para relajarte y sentirte en casa.",
+     sub2:"El descanso también puede lucir muy bien.",
+     tag1:"Sala",cta:"¿Dónde pondrías este sofá?"};
+ }
+ if(is(/\b(bancos?|bancas?|taburetes?)\b/)){
+   return {...base,title1:"Detalles que hacen hogar.",title2:"Un toque diferente para tu espacio.",
+     details:"Una pieza para complementar tu hogar.",
+     sub1:"Transforma ese rincón que quieres renovar.",
+     sub2:"Inspírate con nuevas formas de combinar.",
+     tag1:"Muebles",cta:"¿Dónde colocarías esta pieza?"};
+ }
+ if(is(/\b(buros?|camas?|cabeceras?|recamaras?)\b/)){
+   return {...base,title1:"Un rincón para descansar.",title2:"Tu recámara, tu estilo.",
+     details:"Una pieza para renovar tu habitación.",
+     sub1:"Crea una recámara que se sienta tuya.",
+     sub2:"Pequeños cambios, grandes diferencias.",
+     tag1:"Recámara",cta:"¿Te gustaría para tu recámara?"};
+ }
+ return base;
+}
+function updatePreviewCopy(){
+  $("previewCopy1").textContent="Apertura: "+$("title1").value;
+  $("previewCopy2").textContent="Segunda escena: "+$("title2").value;
+  $("previewDetails").textContent="Detalle: "+$("details").value;
+  $("previewCta").textContent="Cierre: "+$("cta").value;
+}
 try{product=JSON.parse(sessionStorage.getItem("donatello_reel_product")||"null")}catch{}
 if(!product||!product.name){$("generate").disabled=true;say("Abre primero un producto desde el catálogo y selecciona Crear Reel.","bad")}
 else{
@@ -84,7 +171,12 @@ else{
  $("productCode").textContent=product.code||"PRODUCTO DONATELLO";
  $("name").value=String(product.name).slice(0,52);
  $("price").value=Number(product.price||0);
- $("details").value=product.details||"Diseño que transforma tu espacio.";
+ const copy=suggestCopy(product);
+ $("title1").value=copy.title1;
+ $("title2").value=copy.title2;
+ $("cta").value=copy.cta;
+ $("details").value=copy.details;
+ product.reelCopy=copy;
  $("stock").textContent=Number(product.stock)>0?"Disponible en catálogo":"Sin existencias";
  for(const i of [1,2]){
    const sel=$("pick"+i);sel.add(new Option("Selecciona foto del catálogo",""));
@@ -98,6 +190,8 @@ else{
  $("previewPrice").textContent=new Intl.NumberFormat("es-MX",{style:"currency",currency:"MXN"}).format(Number(product.price||0));
  $("name").addEventListener("input",()=>$("previewTitle").textContent=$("name").value);
  $("price").addEventListener("input",()=>$("previewPrice").textContent=new Intl.NumberFormat("es-MX",{style:"currency",currency:"MXN"}).format(Number($("price").value||0)));
+ for(const id of ["title1","title2","cta","details"]){$(id).addEventListener("input",updatePreviewCopy)}
+ updatePreviewCopy();
 }
 async function health(){try{const r=await fetch(BASE+"/health",{cache:"no-store"});if(!r.ok)throw Error("No responde");say("✓ Motor HyperFrames local conectado.","good");return true}catch{say("Motor local apagado. Abre primero el Iniciador del Estudio Donatello en Windows.","bad");return false}}
 health();
@@ -131,9 +225,9 @@ $("generate").addEventListener("click",async()=>{
    const images=[await photoData(1),await photoData(2)];
    const payload={product:$("name").value,price:$("price").value,details:$("details").value,
       title1:$("title1").value,title2:$("title2").value,
-      sub1:"Una pieza cálida y con carácter para elevar tu espacio.",
-      sub2:"El detalle que hace destacar tu hogar.",
-      tag1:"Diseño cálido",tag2:"Pregunta sin compromiso",cta:$("cta").value,images};
+      sub1:product.reelCopy.sub1,
+      sub2:product.reelCopy.sub2,
+      tag1:product.reelCopy.tag1,tag2:product.reelCopy.tag2,cta:$("cta").value,images};
    say("Preparando proyecto V4.2…");
    const job=await json("/api/project",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload)});
    say("HyperFrames está renderizando el MP4. Esta ventana puede permanecer abierta.");
