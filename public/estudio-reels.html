@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="es-MX">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Estudio de Reels | Ventas Donatello</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--dark:#20342c;--gold:#a98155;--cream:#f4efe5;--ink:#24352d;--muted:#6d766f}
+*{box-sizing:border-box}body{margin:0;color:var(--ink);background:linear-gradient(140deg,#faf7f0,#e9e6dd);font:500 15px/1.5 Manrope,Arial,sans-serif}
+header{background:#193126;color:#f7f0e4;padding:19px 5vw;display:flex;align-items:center;justify-content:space-between;gap:20px}
+header strong{font:32px "DM Serif Display",Georgia,serif;font-weight:400}header a{color:#e9d5b4;text-decoration:none;font-weight:700}
+main{max-width:1160px;margin:35px auto;padding:0 20px 55px}.eyebrow{color:#8e795d;text-transform:uppercase;letter-spacing:2px;font-size:12px;font-weight:800}
+h1{font:clamp(35px,5vw,58px)/1.08 "DM Serif Display",Georgia,serif;margin:7px 0 12px}
+.subtitle{color:var(--muted);max-width:800px;margin:0 0 28px}.columns{display:grid;grid-template-columns:1.1fr .9fr;gap:25px}
+.card{background:rgba(255,255,255,.88);border:1px solid #e0ddd5;border-radius:20px;padding:24px;box-shadow:0 13px 40px #2e34240a}
+h2{font:30px "DM Serif Display",Georgia,serif;margin:0 0 15px}label{font-size:13px;display:block;font-weight:800;margin:15px 0 7px}
+input,textarea,select{width:100%;border:1px solid #c9d0c6;background:white;border-radius:10px;padding:11px 12px;font:inherit;color:var(--ink)}
+input:focus,textarea:focus,select:focus{outline:2px solid #d4b486}textarea{min-height:70px;resize:vertical}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:13px}.photo{padding:12px;background:#f5f3ee;border:1px solid #dedad2;border-radius:14px;min-width:0}
+.photo img{display:block;width:100%;height:178px;object-fit:cover;background:#e1dbd2;border-radius:8px}
+.photo select{font-size:13px}.photo input{font-size:12px;min-width:0;padding:6px}
+.photo p{font-size:12px;color:var(--muted);margin:6px 0}.hint{font-size:12px;color:var(--muted);line-height:1.5}
+.priceStock{display:flex;justify-content:space-between;gap:14px;align-items:center;padding:12px 14px;background:#f5f2e9;border-radius:10px}
+.priceStock strong{font-size:23px}.pill{font-size:12px;background:#e7ebe4;padding:6px 9px;border-radius:99px}
+button,.download{display:inline-flex;align-items:center;justify-content:center;gap:8px;text-decoration:none;border:0;border-radius:11px;padding:15px 20px;font:800 14px Manrope,sans-serif;cursor:pointer}
+.primary{background:#264c3b;color:#fff;width:100%;margin-top:24px}.primary:disabled{opacity:.5;cursor:wait}
+.download{background:#b88b57;color:#fff;width:100%;margin-top:12px}
+#status{margin-top:14px;background:#f1eee5;border-radius:9px;padding:12px;font-size:13px;color:#5e6b5f}
+#status.bad{background:#f9eae7;color:#983f30}#status.good{background:#e9f1e5;color:#2d613c}
+#result{display:none}.video{width:100%;max-height:650px;background:#15130f;border-radius:14px}
+.small{font-size:13px;color:var(--muted)}.previewTitle{font:32px "DM Serif Display",Georgia,serif}
+.previewCard{background:linear-gradient(180deg,#242920,#483829);color:#f5eee1;padding:28px;border-radius:14px;text-align:center}
+.previewImages{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin:15px 0}.previewImages img{width:100%;height:200px;object-fit:cover;border-radius:8px}
+@media(max-width:830px){.columns{grid-template-columns:1fr}header strong{font-size:26px}.card{padding:16px}.grid2{grid-template-columns:1fr}.photo img{height:240px}}
+</style>
+</head>
+<body>
+<header><strong>Ventas Donatello</strong><a href="/">← Volver al catálogo</a></header>
+<main>
+<div class="eyebrow">Producción local · HyperFrames · Plantilla editorial V4.2</div>
+<h1>Estudio de Reels</h1>
+<p class="subtitle">Tomamos los datos públicos del producto seleccionado. Ajusta dos fotografías reales —idealmente en ambiente— y genera tu MP4 desde HyperFrames instalado en esta computadora. El catálogo público no genera videos ni almacena tus proyectos.</p>
+<div class="columns">
+<section class="card">
+<h2>Tu producto</h2>
+<p id="productCode" class="eyebrow"></p>
+<label for="name">Nombre para el video</label><input id="name" maxlength="52">
+<div class="grid2"><div><label for="price">Precio MXN</label><input id="price" type="number" min="1" step="1" max="100000000"></div><div><label for="details">Detalle breve</label><input id="details" maxlength="100" placeholder="8 focos · ideal para comedor"></div></div>
+<div class="priceStock"><span>Datos cargados del catálogo</span><span class="pill" id="stock">Verificando…</span></div>
+<h2 style="margin-top:28px">Fotografías del Reel</h2>
+<div class="grid2">
+<div class="photo"><strong>1 · Apertura</strong><img id="thumb1" alt="Fotografía 1"><label for="pick1">Del catálogo</label><select id="pick1"></select><label for="file1">O reemplazar con foto local</label><input type="file" id="file1" accept="image/jpeg,image/png,image/webp"><p>Se recomienda fotografía real en ambiente.</p></div>
+<div class="photo"><strong>2 · Cierre y precio</strong><img id="thumb2" alt="Fotografía 2"><label for="pick2">Del catálogo</label><select id="pick2"></select><label for="file2">O reemplazar con foto local</label><input type="file" id="file2" accept="image/jpeg,image/png,image/webp"><p>El precio se muestra sobre esta imagen.</p></div>
+</div>
+<p class="hint">Si el producto solo tiene una foto, agrega otra aquí. No utilizamos fotos parecidas ni sustituimos el producto por imágenes generadas.</p>
+<div class="grid2">
+<div><label for="title1">Título inicial</label><input id="title1" maxlength="55" value="Luz que&#10;transforma."></div>
+<div><label for="title2">Título segunda escena</label><input id="title2" maxlength="55" value="El detalle que&#10;cambia todo."></div>
+</div>
+<label for="cta">Pregunta de cierre</label><input id="cta" maxlength="75" value="¿Dónde lo pondrías en tu casa?">
+<button id="generate" class="primary">▶ Generar MP4 en mi computadora</button>
+<div id="status" aria-live="polite">Comprobando motor local…</div>
+</section>
+<section class="card">
+<h2>Vista del proyecto</h2>
+<div class="previewCard"><div class="eyebrow" style="color:#dfbf8f">Donatello presenta</div><div class="previewTitle" id="previewTitle">Tu próximo Reel</div><div class="previewImages"><img id="prev1" alt="Primer ambiente"><img id="prev2" alt="Segundo ambiente"></div><div style="font-size:25px;font-weight:800" id="previewPrice"></div><div class="small" style="color:#e3d4c1">Cierre sobre el segundo ambiente · 11.8 segundos · 9:16</div></div>
+<p class="small">Esta vista organiza las fotografías y los datos. El movimiento y las transiciones exactas se comprueban en el MP4 final.</p>
+<div id="result"><h2 style="margin-top:25px">Tu Reel terminado</h2><video id="video" class="video" controls playsinline></video><a id="download" class="download">⬇ Descargar MP4</a></div>
+</section>
+</div>
+</main>
+<script>
+"use strict";
+const BASE="http://127.0.0.1:4477";
+const $=id=>document.getElementById(id);
+let product=null, gallery=[];
+function say(message,kind=""){$("status").textContent=message;$("status").className=kind}
+function setImage(index,src){$("thumb"+index).src=src||"";$("prev"+index).src=src||""}
+try{product=JSON.parse(sessionStorage.getItem("donatello_reel_product")||"null")}catch{}
+if(!product||!product.name){$("generate").disabled=true;say("Abre primero un producto desde el catálogo y selecciona Crear Reel.","bad")}
+else{
+ gallery=(Array.isArray(product.images)?product.images:[]).filter(Boolean);
+ $("productCode").textContent=product.code||"PRODUCTO DONATELLO";
+ $("name").value=String(product.name).slice(0,52);
+ $("price").value=Number(product.price||0);
+ $("details").value=product.details||"Diseño que transforma tu espacio.";
+ $("stock").textContent=Number(product.stock)>0?"Disponible en catálogo":"Sin existencias";
+ for(const i of [1,2]){
+   const sel=$("pick"+i);sel.add(new Option("Selecciona foto del catálogo",""));
+   gallery.forEach((url,k)=>sel.add(new Option("Fotografía "+(k+1),String(k))));
+   sel.value=gallery.length?String(Math.min(i-1,gallery.length-1)):"";
+   setImage(i,gallery[Number(sel.value)]||"");
+   sel.addEventListener("change",()=>{if(sel.value!==""){$("file"+i).value="";setImage(i,gallery[Number(sel.value)])}});
+   $("file"+i).addEventListener("change",()=>{let file=$("file"+i).files[0];if(file){sel.value="";setImage(i,URL.createObjectURL(file))}else if(sel.value!=="")setImage(i,gallery[Number(sel.value)])});
+ }
+ $("previewTitle").textContent=product.name;
+ $("previewPrice").textContent=new Intl.NumberFormat("es-MX",{style:"currency",currency:"MXN"}).format(Number(product.price||0));
+ $("name").addEventListener("input",()=>$("previewTitle").textContent=$("name").value);
+ $("price").addEventListener("input",()=>$("previewPrice").textContent=new Intl.NumberFormat("es-MX",{style:"currency",currency:"MXN"}).format(Number($("price").value||0)));
+}
+async function health(){try{const r=await fetch(BASE+"/health",{cache:"no-store"});if(!r.ok)throw Error("No responde");say("✓ Motor HyperFrames local conectado.","good");return true}catch{say("Motor local apagado. Abre primero el Iniciador del Estudio Donatello en Windows.","bad");return false}}
+health();
+async function photoData(i){
+ const file=$("file"+i).files[0];
+ if(file)return toBase64(file);
+ const sel=$("pick"+i);
+ if(sel.value==="")throw Error("Selecciona o carga la fotografía "+i+".");
+ let response;try{response=await fetch(gallery[Number(sel.value)],{mode:"cors"})}catch{throw Error("No se pudo leer la foto "+i+" del catálogo. Descárgala y súbela mediante el selector local.")}
+ if(!response.ok)throw Error("No se pudo descargar la foto "+i+".");
+ return toBase64(await response.blob());
+}
+function toBase64(blob){return new Promise((resolve,reject)=>{
+ if(blob.size>12*1024*1024)return reject(Error("Cada foto debe pesar máximo 12 MB."));
+ const reader=new FileReader();reader.onload=()=>resolve(reader.result);reader.onerror=()=>reject(Error("No se pudo leer la fotografía."));reader.readAsDataURL(blob)
+})}
+async function json(url,options){
+ const r=await fetch(BASE+url,{cache:"no-store",...options});
+ const data=await r.json();if(!r.ok)throw Error(data.error||"Error local.");
+ return data;
+}
+$("generate").addEventListener("click",async()=>{
+ if(!product)return;
+ $("generate").disabled=true;$("result").style.display="none";
+ try{
+   if(!await health())throw Error("Inicia el motor local antes de generar el video.");
+   if(Number(product.stock)<=0)throw Error("El producto figura sin existencias en el catálogo.");
+   if(!String($("name").value).trim())throw Error("Escribe el nombre del producto.");
+   if(!(Number($("price").value)>0))throw Error("Revisa el precio.");
+   say("Preparando las fotografías…");
+   const images=[await photoData(1),await photoData(2)];
+   const payload={product:$("name").value,price:$("price").value,details:$("details").value,
+      title1:$("title1").value,title2:$("title2").value,
+      sub1:"Una pieza cálida y con carácter para elevar tu espacio.",
+      sub2:"El detalle que hace destacar tu hogar.",
+      tag1:"Diseño cálido",tag2:"Pregunta sin compromiso",cta:$("cta").value,images};
+   say("Preparando proyecto V4.2…");
+   const job=await json("/api/project",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload)});
+   say("HyperFrames está renderizando el MP4. Esta ventana puede permanecer abierta.");
+   await json("/api/render/"+job.id+"/high",{method:"POST"});
+   for(;;){
+     await new Promise(r=>setTimeout(r,1600));
+     const state=await json("/api/status/"+job.id);
+     if(state.state==="done"){
+       $("video").src=BASE+state.output;$("download").href=BASE+state.output;
+       $("result").style.display="block";say("✓ Reel generado. Puedes reproducirlo y descargarlo.","good");break
+     }
+     if(state.state==="error")throw Error(state.message||"Error de HyperFrames");
+     say("Generando video… "+String(state.message||"").slice(0,140))
+   }
+ }catch(error){say(error.message||String(error),"bad")}
+ finally{$("generate").disabled=false}
+});
+</script>
+</body>
+</html>
