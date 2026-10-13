@@ -32,7 +32,13 @@ button,.download{display:inline-flex;align-items:center;justify-content:center;g
 .copyPreview{margin-top:15px;border-top:1px solid #bca98f6b;padding-top:13px;text-align:left;font-size:13px;line-height:1.6}.copyPreview strong{color:#f9e6c5}.copyPreview span{display:block}
 .small{font-size:13px;color:var(--muted)}.previewTitle{font:32px "DM Serif Display",Georgia,serif}
 .previewCard{background:linear-gradient(180deg,#242920,#483829);color:#f5eee1;padding:28px;border-radius:14px;text-align:center}
-.previewImages{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin:15px 0}.previewImages img{width:100%;height:200px;object-fit:cover;border-radius:8px}
+.previewImages{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin:15px 0}.previewImages img{width:100%;height:200px;object-fit:contain;border-radius:8px;background:#3f3b31}
+.templateHint{margin:9px 0 0;background:#f5f2eb;border-left:3px solid #b88b57;border-radius:7px;padding:10px 12px;color:#536356;font-size:13px;line-height:1.4}
+.previewCard[data-template="detalles"]{background:linear-gradient(145deg,#203e2f,#17281f)}
+.previewCard[data-template="detalles"] .previewImages img{border:2px solid #c9a97e;background:#202b20}
+.previewCard[data-template="imagina"]{background:linear-gradient(170deg,#64513f,#222923)}
+.previewCard[data-template="imagina"] .previewImages img{border-radius:20px}
+.previewCard[data-template="editorial"]{background:linear-gradient(180deg,#242920,#483829)}
 @media(max-width:830px){.columns{grid-template-columns:1fr}header strong{font-size:26px}.card{padding:16px}.grid2{grid-template-columns:1fr}.photo img{height:240px}}
 </style>
 </head>
@@ -49,6 +55,14 @@ button,.download{display:inline-flex;align-items:center;justify-content:center;g
 <label for="name">Nombre para el video</label><input id="name" maxlength="52">
 <div class="grid2"><div><label for="price">Precio MXN</label><input id="price" type="number" min="1" step="1" max="100000000"></div><div><label for="details">Detalle breve</label><input id="details" maxlength="100" placeholder="8 focos · ideal para comedor"></div></div>
 <div class="priceStock"><span>Datos cargados del catálogo</span><span class="pill" id="stock">Verificando…</span></div>
+<h2 style="margin-top:28px">Estilo del Reel</h2>
+<label for="template">Plantilla para este producto</label>
+<select id="template">
+<option value="editorial">Editorial cálido · elegante y sutil</option>
+<option value="detalles">Detalles que enamoran · acabado y diseño</option>
+<option value="imagina">Imagina tu espacio · ambiente y hogar</option>
+</select>
+<div id="templateHint" class="templateHint" aria-live="polite">La sugerencia aparecerá según el producto.</div>
 <h2 style="margin-top:28px">Fotografías del Reel</h2>
 <div class="grid2">
 <div class="photo"><strong>1 · Apertura</strong><img id="thumb1" alt="Fotografía 1"><label for="pick1">Del catálogo</label><select id="pick1"></select><label for="file1">O reemplazar con foto local</label><input type="file" id="file1" accept="image/jpeg,image/png,image/webp"><p>Se recomienda fotografía real en ambiente.</p></div>
@@ -65,7 +79,7 @@ button,.download{display:inline-flex;align-items:center;justify-content:center;g
 </section>
 <section class="card">
 <h2>Vista del proyecto</h2>
-<div class="previewCard"><div class="eyebrow" style="color:#dfbf8f">Donatello presenta</div><div class="previewTitle" id="previewTitle">Tu próximo Reel</div><div class="previewImages"><img id="prev1" alt="Primer ambiente"><img id="prev2" alt="Segundo ambiente"></div><div style="font-size:25px;font-weight:800" id="previewPrice"></div><div class="small" style="color:#e3d4c1">Cierre sobre el segundo ambiente · 11.8 segundos · 9:16</div><div class="copyPreview"><strong>Textos que aparecerán en el Reel</strong><span id="previewCopy1"></span><span id="previewCopy2"></span><span id="previewDetails"></span><span id="previewCta"></span></div></div>
+<div id="previewCard" class="previewCard" data-template="editorial"><div class="eyebrow" style="color:#dfbf8f">Donatello presenta</div><div class="previewTitle" id="previewTitle">Tu próximo Reel</div><div class="previewImages"><img id="prev1" alt="Primer ambiente"><img id="prev2" alt="Segundo ambiente"></div><div style="font-size:25px;font-weight:800" id="previewPrice"></div><div class="small" style="color:#e3d4c1">Cierre sobre la segunda fotografía · 11.8 segundos · 9:16</div><div class="copyPreview"><strong>Textos que aparecerán en el Reel</strong><span id="previewCopy1"></span><span id="previewCopy2"></span><span id="previewDetails"></span><span id="previewCta"></span></div></div>
 <p class="small">Esta vista organiza las fotografías y los datos. El movimiento y las transiciones exactas se comprueban en el MP4 final.</p>
 <div id="result"><h2 style="margin-top:25px">Tu Reel terminado</h2><video id="video" class="video" controls playsinline></video><a id="download" class="download">⬇ Descargar MP4</a></div>
 </section>
@@ -158,6 +172,18 @@ function suggestCopy(item){
  }
  return base;
 }
+function recommendTemplate(item){
+ const t=normalizeText(String(item.name||"")+" "+String(item.category||""));
+ if(/\b(sillas?|bancas?|bancos?|taburetes?|sofas?|sillones?|reclinables?|butacas?)\b/.test(t))return "detalles";
+ if(/\b(recamaras?|camas?|cabeceras?|buros?|bases?|escritorios?|armarios?|tocadores?)\b/.test(t))return "imagina";
+ return "editorial";
+}
+function syncTemplatePreview(){
+ const v=$("template").value;
+ $("previewCard").dataset.template=v;
+ const map={editorial:"Editorial cálido",detalles:"Detalles que enamoran",imagina:"Imagina tu espacio"};
+ $("templateHint").textContent="Estilo elegido: "+map[v]+". "+({editorial:"Transiciones suaves y luz cálida.",detalles:"Revelado lateral, encuadre completo y presentación enfocada en los acabados.",imagina:"Movimiento pausado y ambientes más protagonistas."}[v]);
+}
 function updatePreviewCopy(){
   $("previewCopy1").textContent="Apertura: "+$("title1").value;
   $("previewCopy2").textContent="Segunda escena: "+$("title2").value;
@@ -171,6 +197,10 @@ else{
  $("productCode").textContent=product.code||"PRODUCTO DONATELLO";
  $("name").value=String(product.name).slice(0,52);
  $("price").value=Number(product.price||0);
+ const suggestedTemplate=recommendTemplate(product);
+ $("template").value=suggestedTemplate;
+ syncTemplatePreview();
+ $("template").addEventListener("change",syncTemplatePreview);
  const copy=suggestCopy(product);
  $("title1").value=copy.title1;
  $("title2").value=copy.title2;
@@ -193,7 +223,17 @@ else{
  for(const id of ["title1","title2","cta","details"]){$(id).addEventListener("input",updatePreviewCopy)}
  updatePreviewCopy();
 }
-async function health(){try{const r=await fetch(BASE+"/health",{cache:"no-store"});if(!r.ok)throw Error("No responde");say("✓ Motor HyperFrames local conectado.","good");return true}catch{say("Motor local apagado. Abre primero el Iniciador del Estudio Donatello en Windows.","bad");return false}}
+async function health(){
+ try{
+  const r=await fetch(BASE+"/health",{cache:"no-store"});if(!r.ok)throw Error("No responde");
+  const motor=await r.json();
+  if(!Array.isArray(motor.templates)||!["editorial","detalles","imagina"].every(x=>motor.templates.includes(x))){
+    say("El motor local está desactualizado. Cierra el CMD y abre el motor Donatello V3 para generar las tres plantillas.","bad");
+    return false;
+  }
+  say("✓ Motor Donatello V3 conectado · 3 plantillas listas.","good");return true;
+ }catch{say("Motor local apagado. Ejecuta node server.js desde la carpeta del Motor Donatello V3.","bad");return false}
+}
 health();
 async function photoData(i){
  const file=$("file"+i).files[0];
@@ -223,7 +263,7 @@ $("generate").addEventListener("click",async()=>{
    if(!(Number($("price").value)>0))throw Error("Revisa el precio.");
    say("Preparando las fotografías…");
    const images=[await photoData(1),await photoData(2)];
-   const payload={product:$("name").value,price:$("price").value,details:$("details").value,
+   const payload={product:$("name").value,price:$("price").value,details:$("details").value,template:$("template").value,
       title1:$("title1").value,title2:$("title2").value,
       sub1:product.reelCopy.sub1,
       sub2:product.reelCopy.sub2,
