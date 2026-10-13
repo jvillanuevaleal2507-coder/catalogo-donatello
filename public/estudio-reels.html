@@ -34,6 +34,9 @@ button,.download{display:inline-flex;align-items:center;justify-content:center;g
 .previewCard{background:linear-gradient(180deg,#242920,#483829);color:#f5eee1;padding:28px;border-radius:14px;text-align:center}
 .previewImages{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin:15px 0}.previewImages img{width:100%;height:200px;object-fit:contain;border-radius:8px;background:#3f3b31}
 .templateHint{margin:9px 0 0;background:#f5f2eb;border-left:3px solid #b88b57;border-radius:7px;padding:10px 12px;color:#536356;font-size:13px;line-height:1.4}
+.extraCopy{margin-top:18px;border:1px solid #dedad2;border-radius:10px;padding:13px 15px}
+.extraCopy summary{cursor:pointer;font-weight:800}
+.extraCopy[open] summary{margin-bottom:10px}
 .previewCard[data-template="detalles"]{background:linear-gradient(145deg,#203e2f,#17281f)}
 .previewCard[data-template="detalles"] .previewImages img{border:2px solid #c9a97e;background:#202b20}
 .previewCard[data-template="imagina"]{background:linear-gradient(170deg,#64513f,#222923)}
@@ -74,12 +77,20 @@ button,.download{display:inline-flex;align-items:center;justify-content:center;g
 <div><label for="title2">Título segunda escena</label><input id="title2" maxlength="55" value="El detalle que&#10;cambia todo."></div>
 </div>
 <label for="cta">Pregunta de cierre</label><input id="cta" maxlength="75" value="¿Dónde lo pondrías en tu casa?">
+<details class="extraCopy">
+<summary>Editar también las frases pequeñas del video</summary>
+<p class="hint">Estas frases aparecen en el MP4. Puedes personalizarlas para cada producto.</p>
+<label for="sub1">Frase de apoyo · apertura</label><input id="sub1" maxlength="150">
+<label for="sub2">Frase de apoyo · segunda escena</label><input id="sub2" maxlength="150">
+<div class="grid2"><div><label for="tag1">Etiqueta inicial</label><input id="tag1" maxlength="35"></div>
+<div><label for="tag2">Etiqueta de cierre</label><input id="tag2" maxlength="35"></div></div>
+</details>
 <button id="generate" class="primary">▶ Generar MP4 en mi computadora</button>
 <div id="status" aria-live="polite">Comprobando motor local…</div>
 </section>
 <section class="card">
 <h2>Vista del proyecto</h2>
-<div id="previewCard" class="previewCard" data-template="editorial"><div class="eyebrow" style="color:#dfbf8f">Donatello presenta</div><div class="previewTitle" id="previewTitle">Tu próximo Reel</div><div class="previewImages"><img id="prev1" alt="Primer ambiente"><img id="prev2" alt="Segundo ambiente"></div><div style="font-size:25px;font-weight:800" id="previewPrice"></div><div class="small" style="color:#e3d4c1">Cierre sobre la segunda fotografía · 11.8 segundos · 9:16</div><div class="copyPreview"><strong>Textos que aparecerán en el Reel</strong><span id="previewCopy1"></span><span id="previewCopy2"></span><span id="previewDetails"></span><span id="previewCta"></span></div></div>
+<div id="previewCard" class="previewCard" data-template="editorial"><div class="eyebrow" style="color:#dfbf8f">Donatello presenta</div><div class="previewTitle" id="previewTitle">Tu próximo Reel</div><div class="previewImages"><img id="prev1" alt="Primer ambiente"><img id="prev2" alt="Segundo ambiente"></div><div style="font-size:25px;font-weight:800" id="previewPrice"></div><div class="small" style="color:#e3d4c1">Cierre sobre la segunda fotografía · 11.8 segundos · 9:16</div><div class="copyPreview"><strong>Textos que aparecerán en el Reel</strong><span id="previewCopy1"></span><span id="previewSub1"></span><span id="previewCopy2"></span><span id="previewSub2"></span><span id="previewDetails"></span><span id="previewCta"></span></div></div>
 <p class="small">Esta vista organiza las fotografías y los datos. El movimiento y las transiciones exactas se comprueban en el MP4 final.</p>
 <div id="result"><h2 style="margin-top:25px">Tu Reel terminado</h2><video id="video" class="video" controls playsinline></video><a id="download" class="download">⬇ Descargar MP4</a></div>
 </section>
@@ -111,6 +122,35 @@ function suggestCopy(item){
    tag2:"Pregunta sin compromiso",
    cta:"¿Te gustaría tenerlo en casa?"
  };
+ const n=normalizeText(item.name);
+ const brief=label=>{
+   const parts=[];
+   if(/\bcajon(?:es)?\b/.test(n))parts.push(/\bcajones\b/.test(n)?"cajones":"cajón");
+   const levels=n.match(/\b(\d+)\s+niveles\b/);
+   if(levels)parts.push(levels[1]+" niveles");
+   return label+(parts.length?" con "+parts.join(" y "):"")+".";
+ };
+ // Subtipos de mesa ANTES de coincidencias genéricas.
+ if(is(/\b(buros?|mesas? de noche|mesitas? de noche|mesas? de luz|veladores?)\b/)){
+  return {...base,title1:"Haz tuyo cada rincón.",title2:"Tu recámara, con más estilo.",
+    details:brief("Buró"),sub1:"Un complemento para tener cerca lo importante.",
+    sub2:"Los pequeños detalles también cuentan.",tag1:"Recámara",cta:"¿Lo pondrías junto a tu cama?"};
+ }
+ if(is(/\b(mesas? lateral(?:es)?|mesas? auxiliar(?:es)?|mesas? de apoyo|mesitas? lateral(?:es)?|mesitas? auxiliar(?:es)?)\b/)){
+  return {...base,title1:"Un rincón con personalidad.",title2:"Detalles que hacen hogar.",
+    details:brief("Mesa lateral"),sub1:"Un complemento que suma estilo a tu espacio.",
+    sub2:"Diseño que luce en cualquier rincón.",tag1:"Mesa lateral",cta:"¿En qué rincón la pondrías?"};
+ }
+ if(is(/\b(mesas? de centro|mesitas? de centro)\b/)){
+  return {...base,title1:"Tu sala con otro estilo.",title2:"Un detalle que destaca.",
+    details:brief("Mesa de centro"),sub1:"Dale un nuevo aire a tu sala.",
+    sub2:"El centro de atención puede ser tu mesa.",tag1:"Mesa de centro",cta:"¿Cómo la combinarías en tu sala?"};
+ }
+ if(is(/\b(escritorios?|mesas? de trabajo)\b/)){
+  return {...base,title1:"Tu espacio de trabajo.",title2:"Organización con estilo.",
+    details:"Un escritorio para tu espacio.",sub1:"Renueva tu rincón de trabajo o estudio.",
+    sub2:"Un ambiente para inspirarte cada día.",tag1:"Oficina en casa",cta:"¿Dónde pondrías este escritorio?"};
+ }
  if(is(/\b(sillas?|butacas?)\b/)){
    const plural=/\b(sillas|butacas)\b/.test(text);
    return {...base,
@@ -142,12 +182,15 @@ function suggestCopy(item){
      sub2:"Un toque que se nota desde el primer vistazo.",
      tag1:"Decoración",cta:"¿En qué espacio pondrías este espejo?"};
  }
- if(is(/\b(mesas?|comedores?)\b/)){
-   return {...base,title1:"Un espacio para reunirnos.",title2:"Momentos alrededor de la mesa.",
-     details:"Una pieza para compartir en casa.",
-     sub1:"Los mejores momentos necesitan un buen lugar.",
-     sub2:"Inspírate para transformar tu comedor.",
-     tag1:"Muebles para tu hogar",cta:"¿Te gustaría verla en tu comedor?"};
+ if(is(/\b(mesas? (?:de|para) (?:el )?(?:comedor|cocina)|comedores?|antecomedores?)\b/)){
+  return {...base,title1:"Un espacio para reunirnos.",title2:"Momentos alrededor de la mesa.",
+    details:"Una mesa para compartir en casa.",sub1:"Los mejores momentos merecen un buen lugar.",
+    sub2:"Inspírate para transformar tu comedor.",tag1:"Comedor",cta:"¿Te gustaría verla en tu comedor?"};
+ }
+ if(is(/\b(mesas?|mesitas?)\b/)){
+  return {...base,title1:"Una mesa, muchas posibilidades.",title2:"Tu espacio, tu estilo.",
+    details:"Una mesa para complementar tu hogar.",sub1:"Un diseño que suma estilo a tu espacio.",
+    sub2:"Imagina cómo combinarla con tus muebles.",tag1:"Muebles",cta:"¿En qué espacio la colocarías?"};
  }
  if(is(/\b(sofas?|sillones?|reclinables?)\b/)){
    return {...base,title1:"Tu rincón favorito.",title2:"Comodidad con estilo.",
@@ -175,6 +218,7 @@ function suggestCopy(item){
 function recommendTemplate(item){
  const t=normalizeText(String(item.name||"")+" "+String(item.category||""));
  if(/\b(sillas?|bancas?|bancos?|taburetes?|sofas?|sillones?|reclinables?|butacas?)\b/.test(t))return "detalles";
+ if(/\b(buros?|mesas? lateral(?:es)?|mesas? auxiliar(?:es)?|mesas? de noche|mesas? de centro|escritorios?)\b/.test(t))return "imagina";
  if(/\b(recamaras?|camas?|cabeceras?|buros?|bases?|escritorios?|armarios?|tocadores?)\b/.test(t))return "imagina";
  return "editorial";
 }
@@ -187,6 +231,8 @@ function syncTemplatePreview(){
 function updatePreviewCopy(){
   $("previewCopy1").textContent="Apertura: "+$("title1").value;
   $("previewCopy2").textContent="Segunda escena: "+$("title2").value;
+  $("previewSub1").textContent="Apoyo 1: "+$("sub1").value;
+  $("previewSub2").textContent="Apoyo 2: "+$("sub2").value;
   $("previewDetails").textContent="Detalle: "+$("details").value;
   $("previewCta").textContent="Cierre: "+$("cta").value;
 }
@@ -206,7 +252,7 @@ else{
  $("title2").value=copy.title2;
  $("cta").value=copy.cta;
  $("details").value=copy.details;
- product.reelCopy=copy;
+ for(const id of ["sub1","sub2","tag1","tag2"])$(id).value=copy[id];
  $("stock").textContent=Number(product.stock)>0?"Disponible en catálogo":"Sin existencias";
  for(const i of [1,2]){
    const sel=$("pick"+i);sel.add(new Option("Selecciona foto del catálogo",""));
@@ -220,7 +266,7 @@ else{
  $("previewPrice").textContent=new Intl.NumberFormat("es-MX",{style:"currency",currency:"MXN"}).format(Number(product.price||0));
  $("name").addEventListener("input",()=>$("previewTitle").textContent=$("name").value);
  $("price").addEventListener("input",()=>$("previewPrice").textContent=new Intl.NumberFormat("es-MX",{style:"currency",currency:"MXN"}).format(Number($("price").value||0)));
- for(const id of ["title1","title2","cta","details"]){$(id).addEventListener("input",updatePreviewCopy)}
+ for(const id of ["title1","title2","cta","details","sub1","sub2","tag1","tag2"]){$(id).addEventListener("input",updatePreviewCopy)}
  updatePreviewCopy();
 }
 async function health(){
@@ -265,9 +311,9 @@ $("generate").addEventListener("click",async()=>{
    const images=[await photoData(1),await photoData(2)];
    const payload={product:$("name").value,price:$("price").value,details:$("details").value,template:$("template").value,
       title1:$("title1").value,title2:$("title2").value,
-      sub1:product.reelCopy.sub1,
-      sub2:product.reelCopy.sub2,
-      tag1:product.reelCopy.tag1,tag2:product.reelCopy.tag2,cta:$("cta").value,images};
+      sub1:$("sub1").value,
+      sub2:$("sub2").value,
+      tag1:$("tag1").value,tag2:$("tag2").value,cta:$("cta").value,images};
    say("Preparando proyecto V4.2…");
    const job=await json("/api/project",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload)});
    say("HyperFrames está renderizando el MP4. Esta ventana puede permanecer abierta.");
