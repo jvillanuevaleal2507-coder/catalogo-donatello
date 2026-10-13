@@ -396,6 +396,7 @@ export default function App() {
     window.sessionStorage.setItem("donatello_reel_product", JSON.stringify({
       code: product.code,
       name: product.name,
+      category: product.category,
       price: product.price,
       stock: product.stock,
       images: getProductImages(product),
