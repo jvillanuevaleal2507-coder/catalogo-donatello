@@ -2,6 +2,37 @@ import React, { useEffect, useMemo, useState } from "react";
 import { createClient } from "@supabase/supabase-js";
 import { track } from "@vercel/analytics";
 
+const motionPreviewStyles = `
+/* Segunda muestra: movimiento visible y orientado a móvil, sin alterar las fotos. */
+.product-grid .product-card { animation: donatelloReveal .7s cubic-bezier(.16,1,.3,1) both; transition: transform .32s cubic-bezier(.16,1,.3,1), box-shadow .32s ease; will-change: transform; }
+.product-grid .product-card:nth-child(4n + 2) { animation-delay: .10s; }
+.product-grid .product-card:nth-child(4n + 3) { animation-delay: .20s; }
+.product-grid .product-card:nth-child(4n + 4) { animation-delay: .30s; }
+.product-grid .product-card:active { transform: scale(.955); }
+.product-grid .product-card .image-wrap { overflow:hidden; }
+.product-grid .product-card .product-image { transition: transform .55s cubic-bezier(.16,1,.3,1), filter .4s ease; }
+.product-grid .product-card:active .product-image { transform:scale(1.075); }
+.product-grid .product-card .view-pill { transition: transform .35s ease; }
+@media (hover:hover) and (pointer:fine) {
+ .product-grid .product-card:hover { transform:translateY(-9px) scale(1.015); box-shadow:0 20px 38px rgba(36,29,22,.18); }
+ .product-grid .product-card:hover .product-image { transform:scale(1.09); }
+ .product-grid .product-card:hover .view-pill { transform:translateY(-5px); }
+}
+.product-modal-backdrop { animation:donatelloBackdrop .32s ease both; }
+.product-modal { animation:donatelloModal .55s cubic-bezier(.16,1,.3,1) both; }
+.modal-image-wrap .motion-photo-frame { animation:donatelloPhoto .48s cubic-bezier(.16,1,.3,1) both; }
+.modal-thumbnails .modal-thumb { transition:transform .25s ease, box-shadow .25s ease; }
+.modal-thumbnails .modal-thumb.active { transform:translateY(-4px) scale(1.06); }
+@keyframes donatelloReveal { from {opacity:0;transform:translateY(40px) scale(.94);filter:none} to {opacity:1;transform:translateY(0) scale(1);filter:blur(0)} }
+@keyframes donatelloPhoto { from {opacity:.25;transform:translateX(24px) scale(.94)} to {opacity:1;transform:translateX(0) scale(1)} }
+@keyframes donatelloModal { from {opacity:0;transform:translateY(48px) scale(.92)} to {opacity:1;transform:translateY(0) scale(1)} }
+@keyframes donatelloBackdrop {from {opacity:0} to {opacity:1}}
+@media (prefers-reduced-motion:reduce) {
+ .product-grid .product-card,.product-modal,.product-modal-backdrop,.modal-image-wrap .motion-photo-frame {animation:none!important;filter:none!important}
+ .product-grid .product-card,.product-grid .product-card .product-image,.modal-thumbnails .modal-thumb {transition:none!important}
+}
+`;
+
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
@@ -42,7 +73,29 @@ function buildWhatsAppLink(product) {
   return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
 }
 
-function ProductImage({ src, alt }) {
+function thumbnailUrl(src) {
+  if (!src || !src.includes("/storage/v1/object/public/")) return src;
+  // Supabase Image Transformations: if unavailable, onError falls back to original.
+  return src.replace("/storage/v1/object/public/", "/storage/v1/render/image/public/") + (src.includes("?") ? "&" : "?") + "width=480&quality=70&resize=contain";
+}
+
+function ProgressiveProductImage({ src, alt }) {
+  const [loaded, setLoaded] = useState(false);
+  useEffect(() => { setLoaded(false); }, [src]);
+  if (!src) return <ProductImage src={src} alt={alt} />;
+  const preview = thumbnailUrl(src);
+  return (
+    <div className="progressive-photo" style={{position:"relative",width:"100%",height:"100%"}}>
+      {preview !== src && <img src={preview} alt="" aria-hidden="true" style={{width:"100%",height:"100%",objectFit:"contain",position:"absolute",inset:0}} />}
+      <img className="product-image" src={src} alt={alt} loading="eager" decoding="async"
+        onLoad={() => setLoaded(true)}
+        onError={(event) => {event.currentTarget.style.display="none";}}
+        style={{position:"relative",opacity:loaded || preview === src ? 1 : 0,transition:"opacity .2s ease"}} />
+    </div>
+  );
+}
+
+function ProductImage({ src, alt, thumbnail = false, priority = false }) {
   if (!src) {
     return (
       <div className="product-image placeholder">
@@ -54,11 +107,17 @@ function ProductImage({ src, alt }) {
   return (
     <img
       className="product-image"
-      src={src}
+      src={thumbnail ? thumbnailUrl(src) : src}
       alt={alt}
-      loading="lazy"
+      loading={priority ? "eager" : "lazy"}
+      fetchPriority={priority ? "high" : "auto"}
+      decoding="async"
       onError={(event) => {
-        event.currentTarget.style.display = "none";
+        if (thumbnail && event.currentTarget.src !== src) {
+          event.currentTarget.src = src;
+        } else {
+          event.currentTarget.style.display = "none";
+        }
       }}
     />
   );
@@ -454,6 +513,7 @@ export default function App() {
   return (
     <div className="app">
       <style>{styles}</style>
+      <style>{motionPreviewStyles}</style>
       <header className="topbar">
         <div className="topbar-inner">
           <a className="topbar-brand" href="#inicio" onClick={(event) => { event.preventDefault(); navigateSection("inicio"); }}>
@@ -785,7 +845,7 @@ export default function App() {
                     onClick={() => openProduct(product, 0)}
                     aria-label={`Ver galería de ${product.name}`}
                   >
-                    <ProductImage src={productImages[0] || product.image_url} alt={product.name} />
+                    <ProductImage src={productImages[0] || product.image_url} alt={product.name} thumbnail priority={filteredProducts.indexOf(product) < 4} />
                     <span className="stock-pill">Disponible</span>
                     <span className="view-pill">
                       {productImages.length > 1 ? `${productImages.length} fotos` : "Ver detalle"}
@@ -938,7 +998,7 @@ export default function App() {
 
             <div className="modal-gallery">
               <div className="modal-image-wrap">
-                <ProductImage src={selectedImage} alt={selectedProduct.name} />
+                <div key={selectedImage} className="motion-photo-frame"><ProgressiveProductImage src={selectedImage} alt={selectedProduct.name} /></div>
 
                 {selectedImages.length > 1 && (
                   <>
