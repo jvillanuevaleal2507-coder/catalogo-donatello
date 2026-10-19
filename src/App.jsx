@@ -3,22 +3,33 @@ import { createClient } from "@supabase/supabase-js";
 import { track } from "@vercel/analytics";
 
 const motionPreviewStyles = `
-/* Vista previa: microinteracciones inspiradas en React Bits. */
-.product-grid .product-card { animation: donatelloReveal .55s cubic-bezier(.2,.7,.2,1) both; }
-.product-grid .product-card:nth-child(3n + 2) { animation-delay: .07s; }
-.product-grid .product-card:nth-child(3n + 3) { animation-delay: .14s; }
-.product-grid .product-card { transition: transform .24s ease, box-shadow .24s ease; }
-@media (hover: hover) and (pointer: fine) {
- .product-grid .product-card:hover { transform: translateY(-5px); box-shadow: 0 14px 32px rgba(36,29,22,.15); }
- .product-grid .product-card .product-image { transition: transform .45s cubic-bezier(.2,.7,.2,1); }
- .product-grid .product-card:hover .product-image { transform: scale(1.035); }
+/* Segunda muestra: movimiento visible y orientado a móvil, sin alterar las fotos. */
+.product-grid .product-card { animation: donatelloReveal .7s cubic-bezier(.16,1,.3,1) both; transition: transform .32s cubic-bezier(.16,1,.3,1), box-shadow .32s ease; will-change: transform; }
+.product-grid .product-card:nth-child(4n + 2) { animation-delay: .10s; }
+.product-grid .product-card:nth-child(4n + 3) { animation-delay: .20s; }
+.product-grid .product-card:nth-child(4n + 4) { animation-delay: .30s; }
+.product-grid .product-card:active { transform: scale(.955); }
+.product-grid .product-card .image-wrap { overflow:hidden; }
+.product-grid .product-card .product-image { transition: transform .55s cubic-bezier(.16,1,.3,1), filter .4s ease; }
+.product-grid .product-card:active .product-image { transform:scale(1.075); }
+.product-grid .product-card .view-pill { transition: transform .35s ease; }
+@media (hover:hover) and (pointer:fine) {
+ .product-grid .product-card:hover { transform:translateY(-9px) scale(1.015); box-shadow:0 20px 38px rgba(36,29,22,.18); }
+ .product-grid .product-card:hover .product-image { transform:scale(1.09); }
+ .product-grid .product-card:hover .view-pill { transform:translateY(-5px); }
 }
-.modal-image-wrap .motion-photo-frame { animation: donatelloPhoto .28s ease both; }
-@keyframes donatelloReveal { from { opacity:0; transform:translateY(14px); } to { opacity:1; transform:translateY(0); } }
-@keyframes donatelloPhoto { from { opacity:.55; transform:scale(.985); } to { opacity:1; transform:scale(1); } }
-@media (prefers-reduced-motion: reduce) {
- .product-grid .product-card, .modal-image-wrap .motion-photo-frame { animation:none !important; }
- .product-grid .product-card, .product-grid .product-card .product-image { transition:none !important; }
+.product-modal-backdrop { animation:donatelloBackdrop .32s ease both; }
+.product-modal { animation:donatelloModal .55s cubic-bezier(.16,1,.3,1) both; }
+.modal-image-wrap .motion-photo-frame { animation:donatelloPhoto .48s cubic-bezier(.16,1,.3,1) both; }
+.modal-thumbnails .modal-thumb { transition:transform .25s ease, box-shadow .25s ease; }
+.modal-thumbnails .modal-thumb.active { transform:translateY(-4px) scale(1.06); }
+@keyframes donatelloReveal { from {opacity:0;transform:translateY(40px) scale(.94);filter:blur(3px)} to {opacity:1;transform:translateY(0) scale(1);filter:blur(0)} }
+@keyframes donatelloPhoto { from {opacity:.25;transform:translateX(24px) scale(.94)} to {opacity:1;transform:translateX(0) scale(1)} }
+@keyframes donatelloModal { from {opacity:0;transform:translateY(48px) scale(.92)} to {opacity:1;transform:translateY(0) scale(1)} }
+@keyframes donatelloBackdrop {from {opacity:0} to {opacity:1}}
+@media (prefers-reduced-motion:reduce) {
+ .product-grid .product-card,.product-modal,.product-modal-backdrop,.modal-image-wrap .motion-photo-frame {animation:none!important;filter:none!important}
+ .product-grid .product-card,.product-grid .product-card .product-image,.modal-thumbnails .modal-thumb {transition:none!important}
 }
 `;
 
