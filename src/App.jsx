@@ -68,7 +68,8 @@ function normalizeSearchText(value) {
 }
 
 function productLink(product) {
-  return `https://catalogo.ventasdonatello.com/?producto=${encodeURIComponent(product.id)}`;
+  // En produccion usa el dominio oficial; en preview conserva la URL de prueba.
+  return `${window.location.origin}/p/${encodeURIComponent(product.id)}`;
 }
 
 function buildWhatsAppLink(product) {
@@ -1105,6 +1106,8 @@ export default function App() {
                 else if (navigator.clipboard?.writeText) { navigator.clipboard.writeText(link).then(() => window.alert("Enlace copiado")).catch(() => window.prompt("Copia el enlace:", link)); }
                 else { window.prompt("Copia el enlace:", link); }
               }} style={{marginTop:12,padding:"12px 16px",borderRadius:12,cursor:"pointer",width:"100%"}}>🔗 Compartir enlace de este mueble</button>
+
+              <a href={`${productLink(selectedProduct)}?mostrar=1`} target="_blank" rel="noopener noreferrer" style={{display:"block",marginTop:10,textAlign:"center",fontSize:13,textDecoration:"underline"}}>👁️ Ver cómo aparecería el enlace compartido</a>
 
               <p className="modal-note">
                 Catálogo sujeto a disponibilidad. Te atendemos por WhatsApp para confirmar detalles.
