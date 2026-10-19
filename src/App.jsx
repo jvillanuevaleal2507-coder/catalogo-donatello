@@ -67,8 +67,8 @@ function normalizeSearchText(value) {
     .trim();
 }
 
-function buildWhatsAppLink(product) {
-  const message = `Hola, vi este mueble en el catálogo Donatello y me interesa. 😊\n\n${product.name}\nCódigo: ${product.code}\nPrecio publicado: ${money(product.price)}\n\n¿Me confirmas si está disponible?\n\nCatálogo: https://catalogo.ventasdonatello.com/`;
+function productLink(product) {\n  return `https://catalogo.ventasdonatello.com/?producto=${encodeURIComponent(product.id)}`;\n}\n\nfunction buildWhatsAppLink(product) {
+  const message = `Hola, vi este mueble en el catálogo Donatello y me interesa. 😊\n\n${product.name}\nCódigo: ${product.code}\nPrecio publicado: ${money(product.price)}\n\n¿Me confirmas si está disponible?\n\nVer producto: ${productLink(product)}`;
 
   return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
 }
@@ -353,7 +353,7 @@ export default function App() {
         setSelectedImageIndex(0);
       }
 
-      const section = event.state?.donatelloSection || "inicio";
+      const linkedId = new URLSearchParams(window.location.search).get("producto");\n      const linkedProduct = linkedId ? products.find((product) => String(product.id) === linkedId) : null;\n      if (linkedProduct) setSelectedProduct(linkedProduct);\n      const section = linkedProduct ? "productos" : (event.state?.donatelloSection || "inicio");
       setActiveSection(section);
       setMenuOpen(false);
       window.requestAnimationFrame(() => {
@@ -363,7 +363,7 @@ export default function App() {
 
     window.addEventListener("popstate", handlePopState);
     return () => window.removeEventListener("popstate", handlePopState);
-  }, [selectedProduct]);
+  }, [selectedProduct, products]);
 
   async function loadProducts() {
     setLoading(true);
@@ -384,7 +384,7 @@ export default function App() {
     setLoading(false);
   }
 
-  const availableProducts = useMemo(
+  useEffect(() => {\n    if (loading || loadError) return;\n    const id = new URLSearchParams(window.location.search).get("producto");\n    if (!id) return;\n    const match = products.find((product) => String(product.id) === id);\n    if (match) {\n      setSelectedProduct(match);\n      setSelectedImageIndex(0);\n      setActiveSection("productos");\n    }\n  }, [loading, loadError, products]);\n\n  const availableProducts = useMemo(
     () => products.filter((product) => Number(product.stock || 0) > 0),
     [products]
   );
