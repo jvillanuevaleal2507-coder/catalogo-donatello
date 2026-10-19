@@ -1,0 +1,11 @@
+# Permitir descubrir el catálogo y las fichas públicas de Donatello.
+User-agent: *
+Allow: /
+Disallow: /api/
+
+# ChatGPT Search: permitir la lectura de contenido comercial público.
+User-agent: OAI-SearchBot
+Allow: /
+Disallow: /api/
+
+Sitemap: https://catalogo.ventasdonatello.com/sitemap.xml
