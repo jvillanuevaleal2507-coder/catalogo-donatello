@@ -423,7 +423,7 @@ export default function App() {
         donatelloSection: activeSection,
       },
       "",
-      window.location.href
+      productLink(product)
     );
     setSelectedProduct(product);
     setSelectedImageIndex(imageIndex);
@@ -435,6 +435,9 @@ export default function App() {
       return;
     }
 
+    const url = new URL(window.location.href);
+    url.searchParams.delete("producto");
+    window.history.replaceState({ ...(window.history.state || {}), donatelloProductModal: false }, "", url);
     setSelectedProduct(null);
     setSelectedImageIndex(0);
   }
@@ -1077,7 +1080,7 @@ export default function App() {
                 💬 Cotizar este producto
               </a>
 
-              <p className="modal-note">
+              <button type="button" onClick={() => {\n                const link = productLink(selectedProduct);\n                if (navigator.share) { navigator.share({ title: selectedProduct.name, url: link }).catch(() => {}); }\n                else if (navigator.clipboard?.writeText) { navigator.clipboard.writeText(link).then(() => window.alert("Enlace copiado")).catch(() => window.prompt("Copia el enlace:", link)); }\n                else { window.prompt("Copia el enlace:", link); }\n              }} style={{marginTop:12,padding:"12px 16px",borderRadius:12,cursor:"pointer",width:"100%"}}>🔗 Compartir enlace de este mueble</button>\n\n              <p className="modal-note">
                 Catálogo sujeto a disponibilidad. Te atendemos por WhatsApp para confirmar detalles.
               </p>
             </div>
