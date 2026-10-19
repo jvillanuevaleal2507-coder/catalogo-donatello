@@ -1,4 +1,10 @@
-import { track } from "@vercel/analytics";
+import { track as vercelTrack } from "@vercel/analytics";
+import { recordCatalogEvent } from "./commercialTelemetry.js";
+
+function track(name, data = {}) {
+  try { vercelTrack(name, data); } catch { /* Analytics may not be enabled */ }
+  recordCatalogEvent(name, data);
+}
 
 const SEARCH_DEBOUNCE_MS = 700;
 let searchTimer = null;
@@ -14,6 +20,7 @@ function productDataFromCard(card) {
     product_name: clean(card?.querySelector(".product-body h3")?.textContent),
     category: clean(card?.querySelector(".product-category")?.textContent),
     price: clean(card?.querySelector(".price-row strong")?.textContent),
+    product_code: clean(card?.dataset.productCode),
   };
 }
 
@@ -119,10 +126,36 @@ function attachCategoryTracking() {
   }, true);
 }
 
+
+function attachProductConversionTracking() {
+  document.addEventListener("click", (event) => {
+    const whatsapp = event.target.closest?.(".whatsapp-btn, .modal-whatsapp");
+    if (whatsapp) {
+      const card = whatsapp.closest(".product-card");
+      const modal = whatsapp.closest(".product-modal");
+      const data = card ? productDataFromCard(card) : productDataFromModal(modal);
+      recordCatalogEvent("whatsapp_click", {
+        ...data,
+        location: card ? "product_card" : "product_modal",
+      });
+      return;
+    }
+
+    const share = event.target.closest?.(".donatello-product-share");
+    if (share) {
+      const data = productDataFromModal(share.closest(".product-modal"));
+      recordCatalogEvent("product_share", {
+        ...data, location: "product_modal",
+      });
+    }
+  }, true);
+}
+
 export function initDonatelloConversionTracking() {
   observeProductModal();
   attachSearchTracking();
   attachCategoryTracking();
+  attachProductConversionTracking();
 
   track("catalog_session", {
     path: window.location.pathname,
