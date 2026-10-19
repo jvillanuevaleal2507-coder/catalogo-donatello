@@ -442,7 +442,7 @@ export default function App() {
         donatelloSection: activeSection,
       },
       "",
-      productLink(product)
+      `${window.location.pathname}?producto=${encodeURIComponent(product.id)}`
     );
     setSelectedProduct(product);
     setSelectedImageIndex(imageIndex);
