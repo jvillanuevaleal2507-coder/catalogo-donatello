@@ -23,7 +23,7 @@ const motionPreviewStyles = `
 .modal-image-wrap .motion-photo-frame { animation:donatelloPhoto .48s cubic-bezier(.16,1,.3,1) both; }
 .modal-thumbnails .modal-thumb { transition:transform .25s ease, box-shadow .25s ease; }
 .modal-thumbnails .modal-thumb.active { transform:translateY(-4px) scale(1.06); }
-@keyframes donatelloReveal { from {opacity:0;transform:translateY(40px) scale(.94);filter:blur(3px)} to {opacity:1;transform:translateY(0) scale(1);filter:blur(0)} }
+@keyframes donatelloReveal { from {opacity:0;transform:translateY(40px) scale(.94);filter:none} to {opacity:1;transform:translateY(0) scale(1);filter:blur(0)} }
 @keyframes donatelloPhoto { from {opacity:.25;transform:translateX(24px) scale(.94)} to {opacity:1;transform:translateX(0) scale(1)} }
 @keyframes donatelloModal { from {opacity:0;transform:translateY(48px) scale(.92)} to {opacity:1;transform:translateY(0) scale(1)} }
 @keyframes donatelloBackdrop {from {opacity:0} to {opacity:1}}
@@ -73,7 +73,13 @@ function buildWhatsAppLink(product) {
   return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
 }
 
-function ProductImage({ src, alt }) {
+function thumbnailUrl(src) {
+  if (!src || !src.includes("/storage/v1/object/public/")) return src;
+  // Supabase Image Transformations: if unavailable, onError falls back to original.
+  return src.replace("/storage/v1/object/public/", "/storage/v1/render/image/public/") + (src.includes("?") ? "&" : "?") + "width=480&quality=70&resize=contain";
+}
+
+function ProductImage({ src, alt, thumbnail = false, priority = false }) {
   if (!src) {
     return (
       <div className="product-image placeholder">
@@ -85,11 +91,17 @@ function ProductImage({ src, alt }) {
   return (
     <img
       className="product-image"
-      src={src}
+      src={thumbnail ? thumbnailUrl(src) : src}
       alt={alt}
-      loading="lazy"
+      loading={priority ? "eager" : "lazy"}
+      fetchPriority={priority ? "high" : "auto"}
+      decoding="async"
       onError={(event) => {
-        event.currentTarget.style.display = "none";
+        if (thumbnail && event.currentTarget.src !== src) {
+          event.currentTarget.src = src;
+        } else {
+          event.currentTarget.style.display = "none";
+        }
       }}
     />
   );
@@ -817,7 +829,7 @@ export default function App() {
                     onClick={() => openProduct(product, 0)}
                     aria-label={`Ver galería de ${product.name}`}
                   >
-                    <ProductImage src={productImages[0] || product.image_url} alt={product.name} />
+                    <ProductImage src={productImages[0] || product.image_url} alt={product.name} thumbnail priority={filteredProducts.indexOf(product) < 4} />
                     <span className="stock-pill">Disponible</span>
                     <span className="view-pill">
                       {productImages.length > 1 ? `${productImages.length} fotos` : "Ver detalle"}
