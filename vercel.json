@@ -1,5 +1,6 @@
 {
   "rewrites": [
+    { "source": "/p/:id", "destination": "/api/product-preview?id=:id" },
     { "source": "/privacidad", "destination": "/privacidad.html" },
     { "source": "/eliminacion-datos", "destination": "/eliminacion-datos.html" },
     { "source": "/terminos", "destination": "/terminos.html" },
