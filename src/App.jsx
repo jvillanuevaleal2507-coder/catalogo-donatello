@@ -68,7 +68,7 @@ function normalizeSearchText(value) {
 }
 
 function buildWhatsAppLink(product) {
-  const message = `Hola, me interesa este producto de Ventas Donatello:\n\nProducto: ${product.name}\nCódigo: ${product.code}\nPrecio: ${money(product.price)}\n\n¿Me puedes dar más información?`;
+  const message = `Hola, vi este mueble en el catálogo Donatello y me interesa. 😊\n\n${product.name}\nCódigo: ${product.code}\nPrecio publicado: ${money(product.price)}\n\n¿Me confirmas si está disponible?\n\nCatálogo: https://catalogo.ventasdonatello.com/`;
 
   return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
 }
