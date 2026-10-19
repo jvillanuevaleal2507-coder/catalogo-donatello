@@ -1120,6 +1120,7 @@ export default function App() {
       <footer className="footer">
         <strong>Ventas Donatello</strong>
         <span>Catálogo sujeto a disponibilidad.</span>
+        <a href="/muebles" style={{color:"inherit",fontWeight:700}}>Explorar todos los muebles disponibles en Reynosa ↗</a>
       </footer>
     </div>
   );
