@@ -67,8 +67,12 @@ function normalizeSearchText(value) {
     .trim();
 }
 
+function productLink(product) {
+  return `https://catalogo.ventasdonatello.com/?producto=${encodeURIComponent(product.id)}`;
+}
+
 function buildWhatsAppLink(product) {
-  const message = `Hola, vi este mueble en el catálogo Donatello y me interesa. 😊\n\n${product.name}\nCódigo: ${product.code}\nPrecio publicado: ${money(product.price)}\n\n¿Me confirmas si está disponible?\n\nCatálogo: https://catalogo.ventasdonatello.com/`;
+  const message = `Hola, vi este mueble en el catálogo Donatello y me interesa. 😊\n\n${product.name}\nCódigo: ${product.code}\nPrecio publicado: ${money(product.price)}\n\n¿Me confirmas si está disponible?\n\nVer producto: ${productLink(product)}`;
 
   return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
 }
@@ -353,7 +357,10 @@ export default function App() {
         setSelectedImageIndex(0);
       }
 
-      const section = event.state?.donatelloSection || "inicio";
+      const linkedId = new URLSearchParams(window.location.search).get("producto");
+      const linkedProduct = linkedId ? products.find((product) => String(product.id) === linkedId) : null;
+      if (linkedProduct) setSelectedProduct(linkedProduct);
+      const section = linkedProduct ? "productos" : (event.state?.donatelloSection || "inicio");
       setActiveSection(section);
       setMenuOpen(false);
       window.requestAnimationFrame(() => {
@@ -363,7 +370,7 @@ export default function App() {
 
     window.addEventListener("popstate", handlePopState);
     return () => window.removeEventListener("popstate", handlePopState);
-  }, [selectedProduct]);
+  }, [selectedProduct, products]);
 
   async function loadProducts() {
     setLoading(true);
@@ -383,6 +390,18 @@ export default function App() {
 
     setLoading(false);
   }
+
+  useEffect(() => {
+    if (loading || loadError) return;
+    const id = new URLSearchParams(window.location.search).get("producto");
+    if (!id) return;
+    const match = products.find((product) => String(product.id) === id);
+    if (match) {
+      setSelectedProduct(match);
+      setSelectedImageIndex(0);
+      setActiveSection("productos");
+    }
+  }, [loading, loadError, products]);
 
   const availableProducts = useMemo(
     () => products.filter((product) => Number(product.stock || 0) > 0),
@@ -423,7 +442,7 @@ export default function App() {
         donatelloSection: activeSection,
       },
       "",
-      window.location.href
+      `${window.location.pathname}?producto=${encodeURIComponent(product.id)}`
     );
     setSelectedProduct(product);
     setSelectedImageIndex(imageIndex);
@@ -435,6 +454,9 @@ export default function App() {
       return;
     }
 
+    const url = new URL(window.location.href);
+    url.searchParams.delete("producto");
+    window.history.replaceState({ ...(window.history.state || {}), donatelloProductModal: false }, "", url);
     setSelectedProduct(null);
     setSelectedImageIndex(0);
   }
@@ -1076,6 +1098,13 @@ export default function App() {
               >
                 💬 Cotizar este producto
               </a>
+
+              <button type="button" onClick={() => {
+                const link = productLink(selectedProduct);
+                if (navigator.share) { navigator.share({ title: selectedProduct.name, url: link }).catch(() => {}); }
+                else if (navigator.clipboard?.writeText) { navigator.clipboard.writeText(link).then(() => window.alert("Enlace copiado")).catch(() => window.prompt("Copia el enlace:", link)); }
+                else { window.prompt("Copia el enlace:", link); }
+              }} style={{marginTop:12,padding:"12px 16px",borderRadius:12,cursor:"pointer",width:"100%"}}>🔗 Compartir enlace de este mueble</button>
 
               <p className="modal-note">
                 Catálogo sujeto a disponibilidad. Te atendemos por WhatsApp para confirmar detalles.
