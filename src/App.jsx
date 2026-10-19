@@ -79,6 +79,22 @@ function thumbnailUrl(src) {
   return src.replace("/storage/v1/object/public/", "/storage/v1/render/image/public/") + (src.includes("?") ? "&" : "?") + "width=480&quality=70&resize=contain";
 }
 
+function ProgressiveProductImage({ src, alt }) {
+  const [loaded, setLoaded] = useState(false);
+  useEffect(() => { setLoaded(false); }, [src]);
+  if (!src) return <ProductImage src={src} alt={alt} />;
+  const preview = thumbnailUrl(src);
+  return (
+    <div className="progressive-photo" style={{position:"relative",width:"100%",height:"100%"}}>
+      {preview !== src && <img src={preview} alt="" aria-hidden="true" style={{width:"100%",height:"100%",objectFit:"contain",position:"absolute",inset:0}} />}
+      <img className="product-image" src={src} alt={alt} loading="eager" decoding="async"
+        onLoad={() => setLoaded(true)}
+        onError={(event) => {event.currentTarget.style.display="none";}}
+        style={{position:"relative",opacity:loaded || preview === src ? 1 : 0,transition:"opacity .2s ease"}} />
+    </div>
+  );
+}
+
 function ProductImage({ src, alt, thumbnail = false, priority = false }) {
   if (!src) {
     return (
@@ -982,7 +998,7 @@ export default function App() {
 
             <div className="modal-gallery">
               <div className="modal-image-wrap">
-                <div key={selectedImage} className="motion-photo-frame"><ProductImage src={selectedImage} alt={selectedProduct.name} /></div>
+                <div key={selectedImage} className="motion-photo-frame"><ProgressiveProductImage src={selectedImage} alt={selectedProduct.name} /></div>
 
                 {selectedImages.length > 1 && (
                   <>
