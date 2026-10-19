@@ -1,9 +1,36 @@
 {
   "rewrites": [
-    { "source": "/p/:id", "destination": "/api/product-preview?id=:id" },
-    { "source": "/privacidad", "destination": "/privacidad.html" },
-    { "source": "/eliminacion-datos", "destination": "/eliminacion-datos.html" },
-    { "source": "/terminos", "destination": "/terminos.html" },
-    { "source": "/(.*)", "destination": "/index.html" }
+    {
+      "source": "/sitemap.xml",
+      "destination": "/api/sitemap"
+    },
+    {
+      "source": "/muebles",
+      "destination": "/api/seo-products?mode=list"
+    },
+    {
+      "source": "/producto/:id",
+      "destination": "/api/seo-products?mode=product&id=:id"
+    },
+    {
+      "source": "/p/:id",
+      "destination": "/api/product-preview?id=:id"
+    },
+    {
+      "source": "/privacidad",
+      "destination": "/privacidad.html"
+    },
+    {
+      "source": "/eliminacion-datos",
+      "destination": "/eliminacion-datos.html"
+    },
+    {
+      "source": "/terminos",
+      "destination": "/terminos.html"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
   ]
 }
