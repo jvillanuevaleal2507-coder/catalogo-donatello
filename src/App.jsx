@@ -2,6 +2,26 @@ import React, { useEffect, useMemo, useState } from "react";
 import { createClient } from "@supabase/supabase-js";
 import { track } from "@vercel/analytics";
 
+const motionPreviewStyles = `
+/* Vista previa: microinteracciones inspiradas en React Bits. */
+.product-grid .product-card { animation: donatelloReveal .55s cubic-bezier(.2,.7,.2,1) both; }
+.product-grid .product-card:nth-child(3n + 2) { animation-delay: .07s; }
+.product-grid .product-card:nth-child(3n + 3) { animation-delay: .14s; }
+.product-grid .product-card { transition: transform .24s ease, box-shadow .24s ease; }
+@media (hover: hover) and (pointer: fine) {
+ .product-grid .product-card:hover { transform: translateY(-5px); box-shadow: 0 14px 32px rgba(36,29,22,.15); }
+ .product-grid .product-card .product-image { transition: transform .45s cubic-bezier(.2,.7,.2,1); }
+ .product-grid .product-card:hover .product-image { transform: scale(1.035); }
+}
+.modal-image-wrap .motion-photo-frame { animation: donatelloPhoto .28s ease both; }
+@keyframes donatelloReveal { from { opacity:0; transform:translateY(14px); } to { opacity:1; transform:translateY(0); } }
+@keyframes donatelloPhoto { from { opacity:.55; transform:scale(.985); } to { opacity:1; transform:scale(1); } }
+@media (prefers-reduced-motion: reduce) {
+ .product-grid .product-card, .modal-image-wrap .motion-photo-frame { animation:none !important; }
+ .product-grid .product-card, .product-grid .product-card .product-image { transition:none !important; }
+}
+`;
+
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
@@ -454,6 +474,7 @@ export default function App() {
   return (
     <div className="app">
       <style>{styles}</style>
+      <style>{motionPreviewStyles}</style>
       <header className="topbar">
         <div className="topbar-inner">
           <a className="topbar-brand" href="#inicio" onClick={(event) => { event.preventDefault(); navigateSection("inicio"); }}>
@@ -938,7 +959,7 @@ export default function App() {
 
             <div className="modal-gallery">
               <div className="modal-image-wrap">
-                <ProductImage src={selectedImage} alt={selectedProduct.name} />
+                <div key={selectedImage} className="motion-photo-frame"><ProductImage src={selectedImage} alt={selectedProduct.name} /></div>
 
                 {selectedImages.length > 1 && (
                   <>
