@@ -861,7 +861,7 @@ export default function App() {
                 const extraImagesCount = Math.max(productImages.length - 1, 0);
 
                 return (
-                <article className="product-card" key={product.id}>
+                <article className="product-card" key={product.id} data-product-code={product.code}>
                   <button
                     className="image-wrap image-action"
                     type="button"
@@ -1100,7 +1100,7 @@ export default function App() {
                 💬 Cotizar este producto
               </a>
 
-              <button type="button" onClick={() => {
+              <button className="donatello-product-share" type="button" onClick={() => {
                 const link = productLink(selectedProduct);
                 if (navigator.share) { navigator.share({ title: selectedProduct.name, url: link }).catch(() => {}); }
                 else if (navigator.clipboard?.writeText) { navigator.clipboard.writeText(link).then(() => window.alert("Enlace copiado")).catch(() => window.prompt("Copia el enlace:", link)); }
