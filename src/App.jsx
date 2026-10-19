@@ -67,7 +67,11 @@ function normalizeSearchText(value) {
     .trim();
 }
 
-function productLink(product) {\n  return `https://catalogo.ventasdonatello.com/?producto=${encodeURIComponent(product.id)}`;\n}\n\nfunction buildWhatsAppLink(product) {
+function productLink(product) {
+  return `https://catalogo.ventasdonatello.com/?producto=${encodeURIComponent(product.id)}`;
+}
+
+function buildWhatsAppLink(product) {
   const message = `Hola, vi este mueble en el catálogo Donatello y me interesa. 😊\n\n${product.name}\nCódigo: ${product.code}\nPrecio publicado: ${money(product.price)}\n\n¿Me confirmas si está disponible?\n\nVer producto: ${productLink(product)}`;
 
   return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
@@ -353,7 +357,10 @@ export default function App() {
         setSelectedImageIndex(0);
       }
 
-      const linkedId = new URLSearchParams(window.location.search).get("producto");\n      const linkedProduct = linkedId ? products.find((product) => String(product.id) === linkedId) : null;\n      if (linkedProduct) setSelectedProduct(linkedProduct);\n      const section = linkedProduct ? "productos" : (event.state?.donatelloSection || "inicio");
+      const linkedId = new URLSearchParams(window.location.search).get("producto");
+      const linkedProduct = linkedId ? products.find((product) => String(product.id) === linkedId) : null;
+      if (linkedProduct) setSelectedProduct(linkedProduct);
+      const section = linkedProduct ? "productos" : (event.state?.donatelloSection || "inicio");
       setActiveSection(section);
       setMenuOpen(false);
       window.requestAnimationFrame(() => {
@@ -384,7 +391,19 @@ export default function App() {
     setLoading(false);
   }
 
-  useEffect(() => {\n    if (loading || loadError) return;\n    const id = new URLSearchParams(window.location.search).get("producto");\n    if (!id) return;\n    const match = products.find((product) => String(product.id) === id);\n    if (match) {\n      setSelectedProduct(match);\n      setSelectedImageIndex(0);\n      setActiveSection("productos");\n    }\n  }, [loading, loadError, products]);\n\n  const availableProducts = useMemo(
+  useEffect(() => {
+    if (loading || loadError) return;
+    const id = new URLSearchParams(window.location.search).get("producto");
+    if (!id) return;
+    const match = products.find((product) => String(product.id) === id);
+    if (match) {
+      setSelectedProduct(match);
+      setSelectedImageIndex(0);
+      setActiveSection("productos");
+    }
+  }, [loading, loadError, products]);
+
+  const availableProducts = useMemo(
     () => products.filter((product) => Number(product.stock || 0) > 0),
     [products]
   );
@@ -1080,7 +1099,14 @@ export default function App() {
                 💬 Cotizar este producto
               </a>
 
-              <button type="button" onClick={() => {\n                const link = productLink(selectedProduct);\n                if (navigator.share) { navigator.share({ title: selectedProduct.name, url: link }).catch(() => {}); }\n                else if (navigator.clipboard?.writeText) { navigator.clipboard.writeText(link).then(() => window.alert("Enlace copiado")).catch(() => window.prompt("Copia el enlace:", link)); }\n                else { window.prompt("Copia el enlace:", link); }\n              }} style={{marginTop:12,padding:"12px 16px",borderRadius:12,cursor:"pointer",width:"100%"}}>🔗 Compartir enlace de este mueble</button>\n\n              <p className="modal-note">
+              <button type="button" onClick={() => {
+                const link = productLink(selectedProduct);
+                if (navigator.share) { navigator.share({ title: selectedProduct.name, url: link }).catch(() => {}); }
+                else if (navigator.clipboard?.writeText) { navigator.clipboard.writeText(link).then(() => window.alert("Enlace copiado")).catch(() => window.prompt("Copia el enlace:", link)); }
+                else { window.prompt("Copia el enlace:", link); }
+              }} style={{marginTop:12,padding:"12px 16px",borderRadius:12,cursor:"pointer",width:"100%"}}>🔗 Compartir enlace de este mueble</button>
+
+              <p className="modal-note">
                 Catálogo sujeto a disponibilidad. Te atendemos por WhatsApp para confirmar detalles.
               </p>
             </div>
