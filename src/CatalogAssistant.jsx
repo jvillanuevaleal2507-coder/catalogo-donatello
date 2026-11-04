@@ -91,7 +91,7 @@ export default function CatalogAssistant() {
           aria-label="Abrir asistente de Donatello">
           <span className="dchat-launch-symbol" aria-hidden="true">✦</span>
           <span className="dchat-launch-label-desktop">¿Buscas algo?</span>
-          <span className="dchat-launch-label-mobile">Ayuda</span>
+          <span className="dchat-launch-label-mobile">Chat</span>
         </button>
       )}
       {opened && (
