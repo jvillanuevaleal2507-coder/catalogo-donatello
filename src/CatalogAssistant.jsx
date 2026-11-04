@@ -8,7 +8,7 @@ const WHATSAPP = "https://wa.me/528999122313?text=" +
 const QUICK = ["Sillones", "Lámparas", "Mesas", "Ubicación", "Horario"];
 
 function formatPrice(value) {
-  return new Intl.NumberFormat("es-MX", { style: "currency", currency: "MXN", maximumFractionDigits: 0 })
+  return new Intl.NumberFormat("es-MX", { style: "currency", currency: "MXN", minimumFractionDigits: 0, maximumFractionDigits: 2 })
     .format(Number(value) || 0);
 }
 
