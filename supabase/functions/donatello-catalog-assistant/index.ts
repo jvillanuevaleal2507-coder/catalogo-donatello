@@ -92,7 +92,8 @@ function respond(message: string, inventory: Product[]) {
   const q = clean(message);
   const terms = q.split(" ");
   const has = (...words: string[]) => words.some((w) => terms.includes(w) || q.includes(w));
-  const none = { products: [] as ReturnType<typeof availableProduct>[], whatsapp: WHATSAPP };
+  const none = { products: [] as ReturnType<typeof availableProduct>[], whatsapp: WHATSAPP, handoff: false };
+  const human = (reply: string) => ({ ...none, reply, handoff: true });
 
   if (has("ubicacion", "direccion", "donde estan", "como llego", "visitar", "colonia")) {
     return { ...none, reply: "Estamos en Calle Donatello 201, Jarachina Sur, Reynosa. Si necesitas indicaciones, te ayudamos por WhatsApp." };
@@ -101,13 +102,22 @@ function respond(message: string, inventory: Product[]) {
     return { ...none, reply: "Atendemos hasta las 9:30 p. m. Si quieres confirmar la hora de apertura de hoy, escríbenos por WhatsApp." };
   }
   if (has("envio", "envios", "entrega", "domicilio", "flete", "reparto")) {
-    return { ...none, reply: "Podemos ayudarte a revisar la entrega de un mueble. La disponibilidad de envío y su costo se confirman directamente por WhatsApp." };
+    return human("El costo y la disponibilidad de envío requieren confirmación. Te paso con Donatello por WhatsApp y llevas tu pregunta escrita.");
   }
   if (has("pagar", "pago", "tarjeta", "transferencia", "meses", "credito", "apartado", "apartarlo")) {
-    return { ...none, reply: "Para confirmar métodos de pago, apartados o facilidades vigentes, escríbenos por WhatsApp y te atendemos personalmente." };
+    return human("Para confirmar métodos de pago, apartados o facilidades vigentes, te atiende una persona de Donatello por WhatsApp.");
   }
   if (has("asesor", "humano", "persona", "whatsapp", "contacto", "telefono", "hablar", "atencion")) {
-    return { ...none, reply: "Claro. Puedes escribirnos por WhatsApp al 899 912 2313. Te ayudamos personalmente con cualquier duda." };
+    return human("Claro, te comunicamos con Donatello. Puedes abrir WhatsApp con tu pregunta ya preparada.");
+  }
+
+  // Datos no disponibles en el inventario público: nunca inferir medidas, garantías,
+  // colores alternativos, condiciones comerciales ni servicios de instalación.
+  if (has("garantia", "garantias", "devolucion", "devoluciones", "cambios",
+    "medidas", "dimensiones", "altura", "ancho", "largo", "tamaño", "peso",
+    "material", "colores", "instalacion", "armado", "armar", "ensamble",
+    "descuento", "descuentos", "promocion", "promociones", "mayoreo", "factura")) {
+    return human("Ese detalle necesita confirmación. Con gusto te atendemos por WhatsApp para darte la información correcta.");
   }
 
   const matches = searchProducts(message, inventory);
@@ -131,7 +141,7 @@ function respond(message: string, inventory: Product[]) {
       products: inventory.slice(0, 4).map(availableProduct),
     };
   }
-  return { ...none, reply: "Te ayudo con productos, precios de catálogo, ubicación y horario. Dime qué mueble o accesorio buscas, o escríbenos por WhatsApp para una consulta más específica." };
+  return human("No tengo una respuesta confirmada para esa consulta. Puedes hablar directamente con Donatello por WhatsApp; llevarás tu pregunta ya escrita.");
 }
 
 Deno.serve(async (req: Request) => {
@@ -175,7 +185,7 @@ Deno.serve(async (req: Request) => {
     const admin = createClient(url, key, { auth: { persistSession: false, autoRefreshToken: false } });
     const { data: allowed, error: rateError } = await admin.rpc("donatello_catalog_chat_allow", { p_visitor_hash: visitorHash });
     if (rateError) return json({ error: "servicio_no_disponible" }, 503, origin);
-    if (!allowed) return json({ error: "limite_de_consultas", reply: "Por ahora alcanzaste el límite de consultas. Puedes escribirnos por WhatsApp.", whatsapp: WHATSAPP }, 429, origin);
+    if (!allowed) return json({ error: "limite_de_consultas", reply: "Por ahora alcanzaste el límite de consultas. Puedes escribirnos por WhatsApp.", whatsapp: WHATSAPP, handoff: true, products: [] }, 429, origin);
 
     const { data, error } = await admin.from("products")
       .select("id,code,name,category,price,stock")
