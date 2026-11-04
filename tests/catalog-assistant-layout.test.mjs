@@ -13,8 +13,8 @@ test("El chat se muestra abajo a la izquierda, lejos de favoritos", () => {
   assert.match(favorites, /@media\(max-width:760px\)\{\.donatello-favorites-fab\{right:12px;bottom:12px;/);
 });
 
-test("En móviles el chat tiene etiqueta compacta Ayuda", () => {
-  assert.match(assistant, /dchat-launch-label-mobile">Ayuda<\/span>/);
+test("En móviles el chat tiene etiqueta compacta Chat", () => {
+  assert.match(assistant, /dchat-launch-label-mobile">Chat<\/span>/);
   assert.match(css, /\.dchat-launch-label-mobile\s*\{\s*display:\s*none;/);
   assert.match(css, /\.dchat-launch-label-mobile\s*\{\s*display:\s*inline;/);
 });
