@@ -44,3 +44,9 @@ body.donatello-chat-open #donatello-favorites-root .donatello-favorites-fab { vi
   .dchat-message { font-size: 13px; }
 }
 @media (prefers-reduced-motion: reduce) { .dchat-root * { scroll-behavior: auto; } }
+
+/* Traspaso opcional a una persona: visible únicamente cuando el bot no resuelve. */
+.dchat-handoff { display: grid; gap: 7px; margin-top: 12px; }
+.dchat-human-btn { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 11px 12px; min-height: 44px; border-radius: 12px; background: #176d45; color: #fff !important; text-decoration: none; font-size: 13px; font-weight: 800; text-align: center; }
+.dchat-human-btn:hover, .dchat-human-btn:focus-visible { background: #0d5b36; outline-offset: 3px; }
+.dchat-handoff small { color: #736a59; font-size: 11px; line-height: 1.35; }
