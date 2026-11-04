@@ -1,10 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 import "./CatalogAssistant.css";
+import { buildHandoffLink, isProductFollowup } from "./chatHandoff.js";
 
 const ENDPOINT = String(import.meta.env.VITE_SUPABASE_URL || "").replace(/\/$/, "") +
   "/functions/v1/donatello-catalog-assistant";
-const WHATSAPP = "https://wa.me/528999122313?text=" +
-  encodeURIComponent("Hola, vi el catálogo de Donatello y quisiera información.");
 const QUICK = ["Sillones", "Lámparas", "Mesas", "Ubicación", "Horario"];
 
 function formatPrice(value) {
@@ -12,7 +11,7 @@ function formatPrice(value) {
     .format(Number(value) || 0);
 }
 
-export default function CatalogAssistant() {
+export default function CatalogAssistant({ selectedProduct = null }) {
   const [opened, setOpened] = useState(false);
   const [input, setInput] = useState("");
   const [busy, setBusy] = useState(false);
@@ -22,6 +21,7 @@ export default function CatalogAssistant() {
   const inputRef = useRef(null);
   const listRef = useRef(null);
   const callRef = useRef(null);
+  const lastMatchedProductRef = useRef(null);
 
   useEffect(() => {
     if (!opened) return undefined;
@@ -52,6 +52,10 @@ export default function CatalogAssistant() {
     setInput("");
     setOpened(true);
     setBusy(true);
+    const productContext = isProductFollowup(value)
+      ? (selectedProduct || lastMatchedProductRef.current)
+      : null;
+    const handoffLink = buildHandoffLink({ question: value, product: productContext });
     setMessages((existing) => [...existing, { id: "q-" + Date.now(), role: "user", text: value, products: [] }]);
     const controller = new AbortController();
     callRef.current = controller;
@@ -64,11 +68,16 @@ export default function CatalogAssistant() {
       });
       const data = await response.json();
       if (!response.ok && response.status !== 429) throw new Error("Respuesta no disponible");
+      const matches = Array.isArray(data.products) ? data.products.slice(0, 4) : [];
+      if (matches.length === 1) lastMatchedProductRef.current = matches[0];
+      if (matches.length > 1) lastMatchedProductRef.current = null;
       setMessages((existing) => [...existing, {
         id: "a-" + Date.now(),
         role: "bot",
         text: String(data.reply || "Por ahora no pude consultar los productos. Escríbenos por WhatsApp."),
-        products: Array.isArray(data.products) ? data.products.slice(0, 4) : [],
+        products: matches,
+        handoff: data.handoff === true,
+        handoffUrl: data.handoff === true ? handoffLink : "",
       }]);
     } catch (error) {
       if (error?.name !== "AbortError") {
@@ -76,6 +85,8 @@ export default function CatalogAssistant() {
           id: "e-" + Date.now(), role: "bot",
           text: "No pude consultar el catálogo en este momento. Podemos ayudarte por WhatsApp.",
           products: [],
+          handoff: true,
+          handoffUrl: handoffLink,
         }]);
       }
     } finally {
@@ -109,6 +120,14 @@ export default function CatalogAssistant() {
             {messages.map((item) => (
               <div key={item.id} className={"dchat-message dchat-" + item.role}>
                 <p>{item.text}</p>
+                {item.handoff && item.handoffUrl && (
+                  <div className="dchat-handoff">
+                    <a className="dchat-human-btn" href={item.handoffUrl} target="_blank" rel="noopener noreferrer">
+                      Hablar con Donatello <span aria-hidden="true">↗</span>
+                    </a>
+                    <small>Se abrirá WhatsApp con tu consulta. Tú decides si la envías.</small>
+                  </div>
+                )}
                 {item.products?.length > 0 && (
                   <div className="dchat-products">
                     {item.products.map((product) => (
@@ -136,7 +155,14 @@ export default function CatalogAssistant() {
               placeholder="Ej. ¿Tienen mecedoras?" autoComplete="off" />
             <button type="submit" disabled={busy || !input.trim()} aria-label="Enviar pregunta">➤</button>
           </form>
-          <a className="dchat-whatsapp" href={WHATSAPP} target="_blank" rel="noopener noreferrer">
+          <a className="dchat-whatsapp"
+            href={buildHandoffLink({
+              question: [...messages].reverse().find((item) => item.role === "user")?.text || "",
+              product: isProductFollowup([...messages].reverse().find((item) => item.role === "user")?.text || "")
+                ? (selectedProduct || lastMatchedProductRef.current)
+                : null,
+            })}
+            target="_blank" rel="noopener noreferrer">
             ¿Prefieres atención personal? Escríbenos por WhatsApp
           </a>
           <p className="dchat-footnote">Precios y existencia sujetos a confirmación. No compartas datos personales en este chat.</p>
