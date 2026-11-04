@@ -38,6 +38,12 @@ export default function CatalogAssistant() {
     listRef.current.scrollTop = listRef.current.scrollHeight;
   }, [messages, opened, busy]);
 
+  // El botón de favoritos es externo a React y debe ceder espacio al panel de chat.
+  useEffect(() => {
+    document.body.classList.toggle("donatello-chat-open", opened);
+    return () => document.body.classList.remove("donatello-chat-open");
+  }, [opened]);
+
   useEffect(() => () => callRef.current?.abort(), []);
 
   async function send(text) {
@@ -84,7 +90,8 @@ export default function CatalogAssistant() {
         <button className="dchat-launch" type="button" onClick={() => setOpened(true)}
           aria-label="Abrir asistente de Donatello">
           <span className="dchat-launch-symbol" aria-hidden="true">✦</span>
-          <span>¿Buscas algo?</span>
+          <span className="dchat-launch-label-desktop">¿Buscas algo?</span>
+          <span className="dchat-launch-label-mobile">Ayuda</span>
         </button>
       )}
       {opened && (
