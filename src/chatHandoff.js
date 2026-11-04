@@ -23,7 +23,7 @@ function productSummary(product) {
 }
 
 export function isProductFollowup(question) {
-  return /\b(env[ií]o|entrega|domicilio|apartar|apartado|reservar|descuento|oferta|garant[ií]a|cambio|devoluci[oó]n|medidas|medida|dimensiones|ancho|largo|altura|alto|material|armado|armar|instalaci[oó]n|pagar|pago|tarjeta|precio|este|esta|esto|ese|esa|cu[aá]nto|cu[aá]ntos|c[oó]mo)\b/i.test(String(question ?? ""));
+  return /\b(env[ií]o|env[ií]os|env[ií]an|env[ií]ar|entrega|entregan|entregar|flete|domicilio|apartar|apartado|reservar|descuento|oferta|garant[ií]a|cambio|devoluci[oó]n|medidas|medida|dimensiones|ancho|largo|altura|alto|material|armado|armar|instalaci[oó]n|pagar|pago|tarjeta|precio|este|esta|esto|ese|esa|cu[aá]nto|cu[aá]ntos|c[oó]mo)\b/i.test(String(question ?? ""));
 }
 
 export function buildHandoffMessage({ question = "", product = null } = {}) {
