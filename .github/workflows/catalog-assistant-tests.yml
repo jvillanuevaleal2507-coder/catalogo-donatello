@@ -1,0 +1,26 @@
+name: Donatello - Asistente catálogo
+on:
+  pull_request:
+    paths:
+      - 'src/CatalogAssistant*'
+      - 'src/App.jsx'
+      - 'supabase/functions/donatello-catalog-assistant/**'
+      - 'tests/catalog-assistant.test.mjs'
+      - '.github/workflows/catalog-assistant-tests.yml'
+  workflow_dispatch:
+
+jobs:
+  validar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm install --no-audit --no-fund --no-package-lock
+      - run: npm run build
+        env:
+          VITE_SUPABASE_URL: https://lotgmhfqzthhhadavwlu.supabase.co
+          VITE_SUPABASE_ANON_KEY: placeholder-build-only
+      - run: node --test tests/catalog-assistant.test.mjs

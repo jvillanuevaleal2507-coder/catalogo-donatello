@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { createClient } from "@supabase/supabase-js";
 import { track } from "@vercel/analytics";
+import CatalogAssistant from "./CatalogAssistant.jsx";
 
 const motionPreviewStyles = `
 /* Segunda muestra: movimiento visible y orientado a móvil, sin alterar las fotos. */
@@ -1122,6 +1123,7 @@ export default function App() {
         <span>Catálogo sujeto a disponibilidad.</span>
         <a href="/muebles" style={{color:"inherit",fontWeight:700}}>Explorar todos los muebles disponibles en Reynosa ↗</a>
       </footer>
+      <CatalogAssistant />
     </div>
   );
 }
