@@ -1123,7 +1123,7 @@ export default function App() {
         <span>Catálogo sujeto a disponibilidad.</span>
         <a href="/muebles" style={{color:"inherit",fontWeight:700}}>Explorar todos los muebles disponibles en Reynosa ↗</a>
       </footer>
-      <CatalogAssistant />
+      <CatalogAssistant selectedProduct={selectedProduct} />
     </div>
   );
 }
