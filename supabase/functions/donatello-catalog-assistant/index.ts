@@ -63,10 +63,14 @@ function searchProducts(text: string, inventory: Product[]) {
     let score = 0;
     if (code && query.includes(code)) score += 80;
     for (const part of terms) {
-      if (name.includes(part)) score += 5;
-      if (cat.includes(part)) score += 3;
-      if (code.includes(part)) score += 9;
-      if (name.split(" ").some((token) => token.startsWith(part))) score += 1;
+      // "lámparas" busca "lámpara" y "sillones" encuentra "sillón".
+      const variants = [part];
+      if (part.endsWith("es") && part.length > 5) variants.push(part.slice(0, -2));
+      if (part.endsWith("s") && part.length > 4) variants.push(part.slice(0, -1));
+      if (variants.some((v) => name.includes(v))) score += 5;
+      if (variants.some((v) => cat.includes(v))) score += 3;
+      if (variants.some((v) => code.includes(v))) score += 9;
+      if (name.split(" ").some((token) => variants.some((v) => token.startsWith(v)))) score += 1;
     }
     return { product, score };
   }).filter(({ score }) => score > 0).sort((a, b) => b.score - a.score || b.product.id - a.product.id);
