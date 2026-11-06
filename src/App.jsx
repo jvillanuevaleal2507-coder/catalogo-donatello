@@ -1122,6 +1122,11 @@ export default function App() {
         <strong>Ventas Donatello</strong>
         <span>Catálogo sujeto a disponibilidad.</span>
         <a href="/muebles" style={{color:"inherit",fontWeight:700}}>Explorar todos los muebles disponibles en Reynosa ↗</a>
+        <nav aria-label="Información legal y privacidad" style={{display:"flex",flexWrap:"wrap",gap:"12px",justifyContent:"center"}}>
+          <a href="/privacidad">Aviso de privacidad</a>
+          <a href="/terminos">Términos y condiciones</a>
+          <a href="/eliminacion-datos">Eliminación de datos</a>
+        </nav>
       </footer>
       <CatalogAssistant selectedProduct={selectedProduct} />
     </div>

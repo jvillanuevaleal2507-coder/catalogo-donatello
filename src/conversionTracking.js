@@ -1,5 +1,6 @@
 import { track as vercelTrack } from "@vercel/analytics";
 import { recordCatalogEvent } from "./commercialTelemetry.js";
+import { categorizeSearch, categorizeReferrer, categorizePage } from "./searchPrivacy.js";
 
 function track(name, data = {}) {
   try { vercelTrack(name, data); } catch { /* Analytics may not be enabled */ }
@@ -70,7 +71,7 @@ function attachSearchTracking() {
 
       lastSearch = query;
       track("catalog_search", {
-        query,
+        search_category: categorizeSearch(query),
         results_visible: document.querySelectorAll(".product-card").length,
       });
     }, SEARCH_DEBOUNCE_MS);
@@ -158,7 +159,7 @@ export function initDonatelloConversionTracking() {
   attachProductConversionTracking();
 
   track("catalog_session", {
-    path: window.location.pathname,
-    referrer: document.referrer || "direct",
+    page: categorizePage(window.location.pathname),
+    source: categorizeReferrer(document.referrer),
   });
 }
