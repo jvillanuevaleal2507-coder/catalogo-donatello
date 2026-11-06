@@ -4,6 +4,12 @@ on:
     paths:
       - 'src/CatalogAssistant*'
       - 'src/App.jsx'
+      - 'src/searchPrivacy.js'
+      - 'src/conversionTracking.js'
+      - 'src/commercialTelemetry.js'
+      - 'public/privacidad.html'
+      - 'public/terminos.html'
+      - 'tests/catalog-search-privacy.test.mjs'
       - 'supabase/functions/donatello-catalog-assistant/**'
       - 'tests/catalog-assistant*.test.mjs'
       - '.github/workflows/catalog-assistant-tests.yml'
@@ -23,4 +29,4 @@ jobs:
         env:
           VITE_SUPABASE_URL: https://lotgmhfqzthhhadavwlu.supabase.co
           VITE_SUPABASE_ANON_KEY: placeholder-build-only
-      - run: node --test tests/catalog-assistant*.test.mjs
+      - run: node --test tests/catalog-assistant*.test.mjs tests/catalog-search-privacy.test.mjs

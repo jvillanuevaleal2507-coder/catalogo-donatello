@@ -11,6 +11,11 @@ const ALLOWED = new Set([
   "catalog_search", "category_filter", "product_share",
 ]);
 
+const SAFE_SEARCH_CATEGORIES = new Set([
+  "sillas", "sillones", "sofas", "mesas", "lamparas", "espejos",
+  "buros", "comedores", "escritorios", "camas", "decoracion", "otros",
+]);
+
 const environment = window.location.hostname === "catalogo.ventasdonatello.com"
   ? "production"
   : "preview";
@@ -22,18 +27,18 @@ function clean(value, max = 120) {
 export function recordCatalogEvent(eventName, details = {}) {
   if (!ALLOWED.has(eventName)) return;
 
-  const searchTerm = clean(details.query || details.search_term, 90);
-  // Never collect customer contact information accidentally typed into search.
-  if (eventName === "catalog_search" &&
-      (!searchTerm || /@|https?:\/\/|\d{8,}/i.test(searchTerm))) return;
+  // Recibimos solo etiquetas cerradas; ignoramos consultas libres aun si alguien las pasa.
+  const searchCategory = clean(details.search_category, 32);
+  const safeSearchCategory = SAFE_SEARCH_CATEGORIES.has(searchCategory)
+    ? searchCategory : "otros";
 
   const event = {
     environment,
     event_name: eventName,
     product_code: clean(details.product_code, 64),
     product_name: clean(details.product_name, 140),
-    category: clean(details.category, 100),
-    search_term: eventName === "catalog_search" ? searchTerm : "",
+    category: eventName === "catalog_search" ? safeSearchCategory : clean(details.category, 100),
+    search_term: "",
     placement: clean(details.location || details.source || "", 45),
   };
 
